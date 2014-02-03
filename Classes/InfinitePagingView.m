@@ -194,6 +194,14 @@
     
     NSInteger moveDirection = pageIndex - _lastPageIndex;
     if (moveDirection == 0) {
+        moveDirection = 1;
+        
+        for (NSUInteger i = 0; i < abs((int)moveDirection); ++i) {
+            UIView *leftView = [_pageViews objectAtIndex:0];
+            [_pageViews removeObjectAtIndex:0];
+            [_pageViews insertObject:leftView atIndex:_pageViews.count];
+        }
+        
         return;
     } else if (moveDirection > 0.f) {
         for (NSUInteger i = 0; i < abs(moveDirection); ++i) {
