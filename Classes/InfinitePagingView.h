@@ -62,6 +62,11 @@ typedef enum {
 @interface InfinitePagingView : UIView <UIScrollViewDelegate>
 
 /*!
+ @var BOOL deactivates invinte scrolling. (devault = YES)
+ */
+@property (nonatomic, assign) BOOL invinite;
+
+/*!
  @var CGFloat width of inner page.
  */
 @property (nonatomic, assign) CGSize pageSize;
