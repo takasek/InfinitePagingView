@@ -38,6 +38,7 @@
     NSInteger _lastPageIndex;
 }
 
+@synthesize invinite = _invinite;
 @synthesize pageSize = _pageSize;
 @synthesize scrollDirection = _scrollDirection;
 @synthesize currentPageIndex = _currentPageIndex;
@@ -48,6 +49,7 @@
     [super setFrame:frame];
     if (nil == _innerScrollView) {
         _currentPageIndex = 0;
+        _invinite = YES;
         self.userInteractionEnabled = YES;
         self.clipsToBounds = YES;
         _innerScrollView = [[UIScrollView alloc] initWithFrame:frame];
@@ -185,6 +187,8 @@
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
+    if(_invinite==NO) return;
+ 
     NSInteger pageIndex = 0;
     if (_scrollDirection == InfinitePagingViewHorizonScrollDirection) {
         pageIndex = _innerScrollView.contentOffset.x / _innerScrollView.frame.size.width;
