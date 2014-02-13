@@ -206,7 +206,6 @@
             [_pageViews insertObject:leftView atIndex:_pageViews.count];
         }
         
-        return;
     } else if (moveDirection > 0.f) {
         for (NSUInteger i = 0; i < abs(moveDirection); ++i) {
             UIView *leftView = [_pageViews objectAtIndex:0];
