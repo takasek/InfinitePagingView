@@ -45,6 +45,15 @@
         [page addSubview:btn];
         
         [pagingView addPageView:page];
+        
+        UIButton *jumpButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [jumpButton setFrame:CGRectMake(i*20, 20, 20, 15)];
+        [jumpButton setAttributedTitle:[[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%d", i] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:12.f]}]
+                              forState:UIControlStateNormal];
+        jumpButton.tag = i;
+        [jumpButton addTarget:self action:@selector(jump:) forControlEvents:UIControlEventTouchUpInside];
+        [self.view addSubview:jumpButton];
+        
     }
     _pagingView = pagingView;
     
@@ -80,6 +89,11 @@
             pageView.alpha = 1;
         }];
     }];
+}
+
+-(void)jump:(UIButton*)btn {
+    NSInteger targetPage = btn.tag;
+    [_pagingView scrollToPage:targetPage];
 }
 
 @end

@@ -103,6 +103,20 @@
     [self performSelector:@selector(scrollViewDidEndDecelerating:) withObject:_innerScrollView afterDelay:0.5f]; // delay until scroll animation end.
 }
 
+- (void)scrollToPage:(NSUInteger)pageIndex
+{
+    NSInteger direction = _currentPageIndex-pageIndex;
+    if (direction < -floor(_pageViews.count / 2)) {
+        direction += _pageViews.count;
+    } else if (direction > floor(_pageViews.count / 2)) {
+        direction -= _pageViews.count;
+    }
+    NSLog(@"last:%d current:%d target:%d direction:%d", _lastIndexOfArray, _currentPageIndex, pageIndex, direction);
+    [self scrollToDirection:direction animated:YES];
+    [self performSelector:@selector(scrollViewDidEndDecelerating:) withObject:_innerScrollView afterDelay:0.5f]; // delay until scroll animation end.
+}
+
+
 - (void)layoutSubviews {
     [super layoutSubviews];
     [self layoutPages];
@@ -203,13 +217,7 @@
     
     NSInteger moveDirection = pageIndex - _lastIndexOfArray;
     if (moveDirection == 0) {
-        moveDirection = 1;
-        
-        for (NSUInteger i = 0; i < abs((int)moveDirection); ++i) {
-            UIView *leftView = [_pageViews objectAtIndex:0];
-            [_pageViews removeObjectAtIndex:0];
-            [_pageViews insertObject:leftView atIndex:_pageViews.count];
-        }
+        return;
         
     } else if (moveDirection > 0.f) {
         for (NSUInteger i = 0; i < abs((int)moveDirection); ++i) {
@@ -245,7 +253,7 @@
 
     _currentPageIndex += moveDirection;
     
-    //NSLog(@"last:%d current:%d direction:%d", _lastIndexOfArray, _currentPageIndex, moveDirection);
+    NSLog(@"last:%d current:%d direction:%d", _lastIndexOfArray, _currentPageIndex, moveDirection);
     if (_currentPageIndex < 0) {
         _currentPageIndex = _pageViews.count - 1;
     } else if (_currentPageIndex >= _pageViews.count) {

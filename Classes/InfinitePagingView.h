@@ -110,4 +110,12 @@ typedef enum {
  */
 - (void)scrollToNextPage;
 
+/*!
+ Scroll to specified page.
+ @method scrollToPage:
+ @param NSUInteger pageIndex
+ */
+- (void)scrollToPage:(NSUInteger)pageIndex;
+
+
 @end
