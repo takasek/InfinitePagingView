@@ -43,7 +43,7 @@
     [super setFrame:frame];
     if (nil == _innerScrollView) {
         _currentPageIndex = 0;
-        _invinite = YES;
+        _loopEnabled = YES;
         self.userInteractionEnabled = YES;
         self.clipsToBounds = YES;
         _innerScrollView = [[UIScrollView alloc] initWithFrame:frame];
@@ -181,7 +181,7 @@
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
-    if(_invinite==NO) return;
+    if(_loopEnabled==NO) return;
  
     NSInteger pageIndex = 0;
     if (_scrollDirection == InfinitePagingViewHorizonScrollDirection) {
