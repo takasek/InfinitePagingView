@@ -87,6 +87,11 @@ typedef enum {
 @property (nonatomic, assign) id<InfinitePagingViewDelegate> delegate;
 
 /*!
+ @var UIScrollView innerScrollView
+ */
+@property (nonatomic, strong, readonly) UIScrollView *innerScrollView;
+
+/*!
  Let each pageView to do something.
  */
 - (void)enumeratePageViewsUsingBlock:(void (^)(UIView *pageView, NSUInteger pageIndex, NSInteger currentPageIndex, BOOL *stop))block;

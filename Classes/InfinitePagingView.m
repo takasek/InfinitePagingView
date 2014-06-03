@@ -33,7 +33,6 @@
 
 @implementation InfinitePagingView
 {
-    UIScrollView *_innerScrollView;
     NSArray *_defaultPageViews;
     NSMutableArray *_pageViews;
     NSInteger _lastIndexOfArray;
