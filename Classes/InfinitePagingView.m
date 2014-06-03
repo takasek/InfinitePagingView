@@ -212,19 +212,19 @@
         }
         
     } else if (moveDirection > 0.f) {
-        for (NSUInteger i = 0; i < abs(moveDirection); ++i) {
+        for (NSUInteger i = 0; i < abs((int)moveDirection); ++i) {
             UIView *leftView = [_pageViews objectAtIndex:0];
             [_pageViews removeObjectAtIndex:0];
             [_pageViews insertObject:leftView atIndex:_pageViews.count];
         }
         pageIndex -= moveDirection;
     } else if (moveDirection < 0) {
-        for (NSUInteger i = 0; i < abs(moveDirection); ++i) {
+        for (NSUInteger i = 0; i < abs((int)moveDirection); ++i) {
             UIView *rightView = [_pageViews lastObject];
             [_pageViews removeLastObject];
             [_pageViews insertObject:rightView atIndex:0];
         }
-        pageIndex += abs(moveDirection);
+        pageIndex += abs((int)moveDirection);
     }
     if (pageIndex > _pageViews.count - 1) {
         pageIndex = _pageViews.count - 1;
