@@ -233,13 +233,15 @@
 
     _lastPageIndex = pageIndex;
 
+    _currentPageIndex += moveDirection;
+    
+    //NSLog(@"last:%d current:%d direction:%d", _lastPageIndex, _currentPageIndex, moveDirection);
+    if (_currentPageIndex < 0) {
+        _currentPageIndex = _pageViews.count - 1;
+    } else if (_currentPageIndex >= _pageViews.count) {
+        _currentPageIndex = 0;
+    }
     if (nil != _delegate && [_delegate respondsToSelector:@selector(pagingView:didEndDecelerating:atPageIndex:)]) {
-        _currentPageIndex += moveDirection;
-        if (_currentPageIndex < 0) {
-            _currentPageIndex = _pageViews.count - 1;
-        } else if (_currentPageIndex >= _pageViews.count) {
-            _currentPageIndex = 0;
-        }
         [_delegate pagingView:self didEndDecelerating:_innerScrollView atPageIndex:_currentPageIndex];
     }
 }
