@@ -34,6 +34,7 @@
 @implementation InfinitePagingView
 {
     UIScrollView *_innerScrollView;
+    NSArray *_defaultPageViews;
     NSMutableArray *_pageViews;
     NSInteger _lastIndexOfArray;
 }
@@ -73,10 +74,14 @@
 
 - (void)addPageView:(UIView *)pageView
 {
-    if (nil == _pageViews) {
-        _pageViews = [NSMutableArray array];
+    if (nil == _defaultPageViews) {
+        _defaultPageViews = [NSArray array];
     }
-    [_pageViews addObject:pageView];
+    
+    _defaultPageViews = [_defaultPageViews arrayByAddingObject:pageView];
+    
+    _pageViews = [_defaultPageViews mutableCopy];
+    
     [self layoutPages];
 }
 
