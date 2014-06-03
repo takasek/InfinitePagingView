@@ -30,6 +30,16 @@
         UIImageView *page = [[UIImageView alloc] initWithImage:image];
         page.frame = CGRectMake(0.f, 0.f, 100.f, pagingView.frame.size.height);
         page.contentMode = UIViewContentModeScaleAspectFit;
+        
+        page.userInteractionEnabled = YES;
+
+        UIButton *btn = [UIButton buttonWithType:UIButtonTypeInfoDark];
+        btn.tintColor = [UIColor redColor];
+        btn.tag = i;
+        [btn addTarget:self action:@selector(sayMeow:) forControlEvents:UIControlEventTouchUpInside];
+        
+        [page addSubview:btn];
+        
         [pagingView addPageView:page];
     }
     
@@ -46,6 +56,15 @@
     if ([self respondsToSelector:@selector(setEdgesForExtendedLayout:)]) {
         self.edgesForExtendedLayout = UIRectEdgeNone;
     }
+}
+
+-(void)sayMeow:(UIButton*)btn {
+    NSString *str = [NSString stringWithFormat:@"[%d]Meow!", btn.tag];
+    [[[UIAlertView alloc] initWithTitle:nil
+                               message:str
+                              delegate:nil
+                     cancelButtonTitle:@"OK"
+                     otherButtonTitles:nil] show];
 }
 
 @end

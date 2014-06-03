@@ -63,10 +63,10 @@
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event
 {
     UIView *hitView = [super hitTest:point withEvent:event];
-    if (nil != hitView) {
+    if (self == hitView) {
         return _innerScrollView;
     }
-    return nil;
+    return hitView;
 }
 
 #pragma mark - Public methods
