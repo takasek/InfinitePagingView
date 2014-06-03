@@ -94,13 +94,13 @@
 - (void)scrollToPreviousPage
 {
     [self scrollToDirection:1 animated:YES];
-    [self performSelector:@selector(scrollViewDidEndDecelerating:) withObject:_innerScrollView afterDelay:0.5f]; // delay until scroll animation end.
+    //[self performSelector:@selector(scrollViewDidEndDecelerating:) withObject:_innerScrollView afterDelay:0.5f]; // delay until scroll animation end.
 }
 
 - (void)scrollToNextPage
 {
     [self scrollToDirection:-1 animated:YES];
-    [self performSelector:@selector(scrollViewDidEndDecelerating:) withObject:_innerScrollView afterDelay:0.5f]; // delay until scroll animation end.
+    //[self performSelector:@selector(scrollViewDidEndDecelerating:) withObject:_innerScrollView afterDelay:0.5f]; // delay until scroll animation end.
 }
 
 - (void)scrollToPage:(NSUInteger)pageIndex
@@ -113,7 +113,7 @@
     }
     NSLog(@"last:%d current:%d target:%d direction:%d", _lastIndexOfArray, _currentPageIndex, pageIndex, direction);
     [self scrollToDirection:direction animated:YES];
-    [self performSelector:@selector(scrollViewDidEndDecelerating:) withObject:_innerScrollView afterDelay:0.5f]; // delay until scroll animation end.
+    //[self performSelector:@selector(scrollViewDidEndDecelerating:) withObject:_innerScrollView afterDelay:0.5f]; // delay until scroll animation end.
 }
 
 
@@ -202,6 +202,11 @@
     if (nil != _delegate && [_delegate respondsToSelector:@selector(pagingView:willBeginDecelerating:)]) {
         [_delegate pagingView:self willBeginDecelerating:_innerScrollView];
     }
+}
+
+- (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView
+{
+    [self scrollViewDidEndDecelerating:_innerScrollView];
 }
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
