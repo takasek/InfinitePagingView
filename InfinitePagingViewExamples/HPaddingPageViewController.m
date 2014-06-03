@@ -9,6 +9,10 @@
 #import "HPaddingPageViewController.h"
 #import "InfinitePagingView.h"
 
+@interface HPaddingPageViewController()
+@property (nonatomic, strong) InfinitePagingView *pagingView;
+
+@end
 
 @implementation HPaddingPageViewController
 
@@ -42,6 +46,7 @@
         
         [pagingView addPageView:page];
     }
+    _pagingView = pagingView;
     
     // label
     UILabel *labelName = [[UILabel alloc] initWithFrame:CGRectMake(0.f, pagingView.frame.origin.y - 50.f, self.view.frame.size.width, 65.f)];
@@ -65,6 +70,16 @@
                               delegate:nil
                      cancelButtonTitle:@"OK"
                      otherButtonTitles:nil] show];
+    
+    [_pagingView enumeratePageViewsUsingBlock:^(UIView *pageView, NSUInteger pageIndex, NSInteger currentPageIndex, BOOL *stop) {
+        if (pageIndex == currentPageIndex) return;
+        
+        [UIView animateWithDuration:2.f animations:^{
+            pageView.alpha = 0;
+        } completion:^(BOOL finished) {
+            pageView.alpha = 1;
+        }];
+    }];
 }
 
 @end

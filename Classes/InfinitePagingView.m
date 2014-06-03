@@ -71,6 +71,12 @@
 }
 
 #pragma mark - Public methods
+- (void)enumeratePageViewsUsingBlock:(void (^)(UIView *pageView, NSUInteger pageIndex, NSInteger currentPageIndex, BOOL *stop))block
+{
+    [_defaultPageViews enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        block(obj, idx, _currentPageIndex, *stop);
+    }];
+}
 
 - (void)addPageView:(UIView *)pageView
 {
