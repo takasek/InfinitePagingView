@@ -38,12 +38,6 @@
     NSInteger _lastPageIndex;
 }
 
-@synthesize invinite = _invinite;
-@synthesize pageSize = _pageSize;
-@synthesize scrollDirection = _scrollDirection;
-@synthesize currentPageIndex = _currentPageIndex;
-@synthesize delegate;
-
 - (void)setFrame:(CGRect)frame
 {
     [super setFrame:frame];
@@ -159,29 +153,29 @@
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
 {
-    if (nil != delegate && [delegate respondsToSelector:@selector(pagingView:willBeginDragging:)]) {
-        [delegate pagingView:self willBeginDragging:_innerScrollView];
+    if (nil != _delegate && [_delegate respondsToSelector:@selector(pagingView:willBeginDragging:)]) {
+        [_delegate pagingView:self willBeginDragging:_innerScrollView];
     }
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
-    if (nil != delegate && [delegate respondsToSelector:@selector(pagingView:didScroll:)]) {
-        [delegate pagingView:self didScroll:_innerScrollView];
+    if (nil != _delegate && [_delegate respondsToSelector:@selector(pagingView:didScroll:)]) {
+        [_delegate pagingView:self didScroll:_innerScrollView];
     }
 }
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {
-    if (nil != delegate && [delegate respondsToSelector:@selector(pagingView:didEndDragging:)]) {
-        [delegate pagingView:self didEndDragging:_innerScrollView];
+    if (nil != _delegate && [_delegate respondsToSelector:@selector(pagingView:didEndDragging:)]) {
+        [_delegate pagingView:self didEndDragging:_innerScrollView];
     }
 }
 
 - (void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView
 {
-    if (nil != delegate && [delegate respondsToSelector:@selector(pagingView:willBeginDecelerating:)]) {
-        [delegate pagingView:self willBeginDecelerating:_innerScrollView];
+    if (nil != _delegate && [_delegate respondsToSelector:@selector(pagingView:willBeginDecelerating:)]) {
+        [_delegate pagingView:self willBeginDecelerating:_innerScrollView];
     }
 }
 
@@ -239,14 +233,14 @@
 
     _lastPageIndex = pageIndex;
 
-    if (nil != delegate && [delegate respondsToSelector:@selector(pagingView:didEndDecelerating:atPageIndex:)]) {
+    if (nil != _delegate && [_delegate respondsToSelector:@selector(pagingView:didEndDecelerating:atPageIndex:)]) {
         _currentPageIndex += moveDirection;
         if (_currentPageIndex < 0) {
             _currentPageIndex = _pageViews.count - 1;
         } else if (_currentPageIndex >= _pageViews.count) {
             _currentPageIndex = 0;
         }
-        [delegate pagingView:self didEndDecelerating:_innerScrollView atPageIndex:_currentPageIndex];
+        [_delegate pagingView:self didEndDecelerating:_innerScrollView atPageIndex:_currentPageIndex];
     }
 }
 
