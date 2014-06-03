@@ -121,7 +121,7 @@
         idx++;
     }
 
-    _lastPageIndex = floor(_pageViews.count / 2);
+    _lastPageIndex = _currentPageIndex = floor(_pageViews.count / 2);
     if (_scrollDirection == InfinitePagingViewHorizonScrollDirection) {
         _innerScrollView.contentSize = CGSizeMake(_pageViews.count * _innerScrollView.frame.size.width, self.frame.size.height);
         _innerScrollView.contentOffset = CGPointMake(_pageSize.width * _lastPageIndex, 0.f);
