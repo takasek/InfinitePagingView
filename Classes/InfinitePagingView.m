@@ -221,7 +221,6 @@
     
     NSUInteger idx = 0;
     for (UIView *pageView in _pageViews) {
-        UIView *pageView = [_pageViews objectAtIndex:idx];
         if (_scrollDirection == InfinitePagingViewHorizonScrollDirection) {
             pageView.center = CGPointMake(idx * _innerScrollView.frame.size.width + _innerScrollView.frame.size.width / 2, _innerScrollView.center.y);
         } else {
