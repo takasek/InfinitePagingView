@@ -25,8 +25,8 @@
     pagingView.pageSize = CGSizeMake(120.f, self.view.frame.size.height);
     [self.view addSubview:pagingView];
     
-    for (NSUInteger i = 1; i <= 15; ++i) {
-        UIImage *image = [UIImage imageNamed:[NSString stringWithFormat:@"%d.JPG", i]];
+    for (NSUInteger i = 0; i < 15; ++i) {
+        UIImage *image = [UIImage imageNamed:[NSString stringWithFormat:@"%d.JPG", i+1]];
         UIImageView *page = [[UIImageView alloc] initWithImage:image];
         page.frame = CGRectMake(0.f, 0.f, 100.f, pagingView.frame.size.height);
         page.contentMode = UIViewContentModeScaleAspectFit;
