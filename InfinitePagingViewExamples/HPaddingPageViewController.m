@@ -37,8 +37,11 @@
         
         page.userInteractionEnabled = YES;
 
-        UIButton *btn = [UIButton buttonWithType:UIButtonTypeInfoDark];
+        UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
+        [btn setTitle:[NSString stringWithFormat:@"%d",i] forState:UIControlStateNormal];
         btn.tintColor = [UIColor redColor];
+        [btn setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
+        [btn setFrame:CGRectMake(0,0, 40, 20)];
         btn.tag = i;
         [btn addTarget:self action:@selector(sayMeow:) forControlEvents:UIControlEventTouchUpInside];
         
