@@ -42,8 +42,7 @@
 
 @interface InfinitePagingView()
 @property (nonatomic, strong) NSArray *defaultPageViews;
-@property (nonatomic, strong) NSMutableArray *pageViews;
-@property (nonatomic, assign) NSInteger lastIndexOfArray;
+@property (nonatomic, strong) NSArray *pageViews;
 @end
 
 @implementation InfinitePagingView
@@ -65,22 +64,56 @@
         _innerScrollView.showsHorizontalScrollIndicator = NO;
         _innerScrollView.showsVerticalScrollIndicator = NO;
         [self addSubview:_innerScrollView];
-        self.pageSize = frame.size;
+        _pageSize = frame.size;
     }
+}
+
+-(NSInteger)shiftedPageIndex:(int)baseIndex offset:(int)offset
+{
+    NSInteger result = baseIndex + offset;
+    
+    if (result < 0) {
+        result += self.pageViews.count;
+    } else if (result >= self.pageViews.count) {
+        result -= self.pageViews.count;
+    }
+    
+    return result;
 }
 
 -(NSInteger)offsetWithPageIndex:(int)targetPageIndex basePageIndex:(int)basePageIndex
 {
-    NSInteger offset = basePageIndex - targetPageIndex;
+    NSInteger offset = targetPageIndex - basePageIndex;
     
-    if (offset < -floor(_pageViews.count / 2)) {
-        offset += _pageViews.count;
-    } else if (offset > floor(_pageViews.count / 2)) {
-        offset -= _pageViews.count;
+    if (offset < -floor(self.pageViews.count / 2)) {
+        offset += self.pageViews.count;
+    } else if (offset > floor(self.pageViews.count / 2)) {
+        offset -= self.pageViews.count;
     }
     
     return offset;
 }
+
+-(NSInteger)viewOrderWithPageIndex:(NSInteger)pageIndex
+{
+    if (!_loopEnabled) return pageIndex;
+    
+    NSInteger offset = [self offsetWithPageIndex:pageIndex basePageIndex:self.currentPageIndex];
+    NSInteger orderOfCurrentPageIndex = floor(self.pageViews.count/2);
+    return orderOfCurrentPageIndex + offset;
+}
+
+- (NSInteger)pageIndexWithPageViewOrigin:(CGPoint)origin
+{
+    NSInteger order = [self pageOrderWithPageViewOrigin:origin];
+
+    if (!_loopEnabled) return order;
+    
+    NSInteger orderOfCurrentPageIndex = floor(self.pageViews.count/2);
+    return [self shiftedPageIndex:_currentPageIndex offset:(order-orderOfCurrentPageIndex)];
+}
+
+
 
 #pragma mark - value affected by horizontal/vertical direction
 - (CGRect)scrollViewFrame
@@ -91,31 +124,20 @@
 
 - (CGSize)scrollViewContentSize
 {
-    return CGSizeMake(self.frame.size.width * self.pageViews.count, self.frame.size.height);
+    return CGSizeMake(self.pageSize.width * self.pageViews.count, self.frame.size.height);
 }
 
-- (CGPoint)pageViewCenterAtPageIndex:(int)idx
+- (CGPoint)pageViewOriginAtPageIndex:(int)pageIndex
 {
-    return CGPointMake(idx * (self.innerScrollView.frame.size.width) + (self.innerScrollView.frame.size.width / 2), self.innerScrollView.center.y);
+    return CGPointMake(self.pageSize.width * [self viewOrderWithPageIndex:pageIndex], 0.f);
 }
 
-- (CGRect)rectToVisibleWithOffset:(NSInteger)moveDirection
+- (NSInteger)pageOrderWithPageViewOrigin:(CGPoint)origin
 {
-    if (0 != fmodf(self.innerScrollView.contentOffset.x, self.pageSize.width)) return CGRectNull;
-    return CGRectMake(self.innerScrollView.contentOffset.x - self.innerScrollView.frame.size.width * moveDirection,
-                      self.innerScrollView.contentOffset.y,
-                      self.innerScrollView.frame.size.width, self.innerScrollView.frame.size.height);
+    return origin.x / self.pageSize.width;
 }
 
-- (NSInteger)pageIndexWithContentOffset:(CGPoint)offset
-{
-    return offset.x / self.innerScrollView.frame.size.width;
-}
 
-- (CGPoint)contentOffsetAtPageIndex:(int)idx
-{
-    return CGPointMake(self.pageSize.width * idx, 0.f);
-}
 
 #pragma mark - Public methods
 - (void)enumeratePageViewsUsingBlock:(void (^)(UIView *pageView, NSUInteger pageIndex, NSInteger currentPageIndex, BOOL *stop))block
@@ -135,7 +157,7 @@
     
     _pageViews = [_defaultPageViews mutableCopy];
     
-    _lastIndexOfArray = _currentPageIndex = floor(_pageViews.count / 2);
+    _currentPageIndex = 0; //floor(_pageViews.count / 2);
     
     [self layoutPages];
 }
@@ -154,11 +176,7 @@
 
 - (void)scrollToPage:(NSUInteger)pageIndex
 {
-    NSInteger direction = [self offsetWithPageIndex:pageIndex basePageIndex:_currentPageIndex];
-    
-    NSLog(@"last:%d current:%d target:%d direction:%d", _lastIndexOfArray, _currentPageIndex, pageIndex, direction);
-    [self scrollToDirection:direction animated:YES];
-    //[self performSelector:@selector(scrollViewDidEndDecelerating:) withObject:_innerScrollView afterDelay:0.5f]; // delay until scroll animation end.
+    [self scrollToPage:pageIndex animated:YES];
 }
 
 
@@ -171,24 +189,39 @@
 
 - (void)layoutPages
 {
-    
     _innerScrollView.frame = [self scrollViewFrame];
     _innerScrollView.contentSize = [self scrollViewContentSize];
+    _innerScrollView.contentOffset = [self pageViewOriginAtPageIndex:_currentPageIndex];
     
+    __block UIScrollView *weakScrollView = _innerScrollView;
     [_pageViews enumerateObjectsUsingBlock:^(UIView *pageView, NSUInteger idx, BOOL *stop) {
-        pageView.center = [self pageViewCenterAtPageIndex:idx];
-        [_innerScrollView addSubview:pageView];
+        pageView.frame = ({
+            CGRect frame = pageView.frame;
+            frame.origin = [self pageViewOriginAtPageIndex:idx];
+            frame.origin.x += (self.pageSize.width - frame.size.width) / 2;
+            frame.origin.y += (self.pageSize.height - frame.size.height) / 2;
+            frame;
+        });
+        [weakScrollView addSubview:pageView];
     }];
-    
-    _innerScrollView.contentOffset = [self contentOffsetAtPageIndex:_lastIndexOfArray];
 }
 
 - (void)scrollToDirection:(NSInteger)moveDirection animated:(BOOL)animated
 {
-    CGRect adjustScrollRect = [self rectToVisibleWithOffset:moveDirection];
-
-    [_innerScrollView scrollRectToVisible:adjustScrollRect animated:animated];
+    [self scrollToPage:[self shiftedPageIndex:_currentPageIndex offset:moveDirection] animated:animated];
 }
+
+- (void)scrollToPage:(NSInteger)pageIndex animated:(BOOL)animated
+{
+    CGRect rect = CGRectZero;
+    rect.origin = [self pageViewOriginAtPageIndex:pageIndex];
+    rect.size = self.pageSize;
+    
+    [_innerScrollView scrollRectToVisible:rect animated:animated];
+}
+
+
+
 
 #pragma mark - UIScrollViewDelegate methods
 
@@ -227,49 +260,20 @@
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
-    if(_loopEnabled==NO) return;
- 
-    NSInteger pageIndex = [self pageIndexWithContentOffset:_innerScrollView.contentOffset];
-    
-    NSInteger moveDirection = pageIndex - _lastIndexOfArray;
-    if (moveDirection == 0) {
-        return;
-        
-    } else if (moveDirection > 0.f) {
-        for (NSUInteger i = 0; i < abs((int)moveDirection); ++i) {
-            UIView *leftView = [_pageViews objectAtIndex:0];
-            [_pageViews removeObjectAtIndex:0];
-            [_pageViews insertObject:leftView atIndex:_pageViews.count];
-        }
-        pageIndex -= moveDirection;
-    } else if (moveDirection < 0) {
-        for (NSUInteger i = 0; i < abs((int)moveDirection); ++i) {
-            UIView *rightView = [_pageViews lastObject];
-            [_pageViews removeLastObject];
-            [_pageViews insertObject:rightView atIndex:0];
-        }
-        pageIndex += abs((int)moveDirection);
-    }
-    if (pageIndex > _pageViews.count - 1) {
-        pageIndex = _pageViews.count - 1;
-    }
-    
-    [_pageViews enumerateObjectsUsingBlock:^(UIView *pageView, NSUInteger idx, BOOL *stop) {
-        pageView.center = [self pageViewCenterAtPageIndex:idx];
-    }];
-    
-    [self scrollToDirection:moveDirection animated:NO];
+    NSInteger pageIndex = [self pageIndexWithPageViewOrigin:_innerScrollView.contentOffset];
+    [self reloadPageViewsWithPageIndex:pageIndex];
+}
 
-    _lastIndexOfArray = pageIndex;
-
-    _currentPageIndex += moveDirection;
+-(void)reloadPageViewsWithPageIndex:(NSInteger)pageIndex
+{
+    if (_currentPageIndex == pageIndex) return;
     
-    NSLog(@"last:%d current:%d direction:%d", _lastIndexOfArray, _currentPageIndex, moveDirection);
-    if (_currentPageIndex < 0) {
-        _currentPageIndex = _pageViews.count - 1;
-    } else if (_currentPageIndex >= _pageViews.count) {
-        _currentPageIndex = 0;
+    _currentPageIndex = pageIndex;
+    
+    if (_loopEnabled) {
+        [self layoutPages];
     }
+    
     if (nil != _delegate && [_delegate respondsToSelector:@selector(pagingView:didEndDecelerating:atPageIndex:)]) {
         [_delegate pagingView:self didEndDecelerating:_innerScrollView atPageIndex:_currentPageIndex];
     }
@@ -279,7 +283,6 @@
 
 
 @implementation VerticalInfinitePagingView
-
 - (CGRect)scrollViewFrame
 {
     CGFloat top_margin  = (self.frame.size.height - self.pageSize.height) / 2;
@@ -288,30 +291,17 @@
 
 - (CGSize)scrollViewContentSize
 {
-    return CGSizeMake(self.frame.size.width, self.frame.size.height * self.pageViews.count);
+    return CGSizeMake(self.pageSize.width, self.frame.size.height * self.pageViews.count);
 }
 
-- (CGPoint)pageViewCenterAtPageIndex:(int)idx
+- (CGPoint)pageViewOriginAtPageIndex:(int)pageIndex
 {
-    return CGPointMake(self.innerScrollView.center.x, idx * (self.innerScrollView.frame.size.height) + (self.innerScrollView.frame.size.height / 2));
+    return CGPointMake(0.f, self.pageSize.height * [self viewOrderWithPageIndex:pageIndex]);
 }
 
-- (CGRect)rectToVisibleWithOffset:(NSInteger)moveDirection
+- (NSInteger)pageOrderWithPageViewOrigin:(CGPoint)origin
 {
-    if (0 != fmodf(self.innerScrollView.contentOffset.y, self.pageSize.height)) return CGRectNull;
-    return CGRectMake(self.innerScrollView.contentOffset.x,
-                      self.innerScrollView.contentOffset.y - self.innerScrollView.frame.size.height * moveDirection,
-                      self.innerScrollView.frame.size.width, self.innerScrollView.frame.size.height);
-}
-
-- (NSInteger)pageIndexWithContentOffset:(CGPoint)offset
-{
-    return offset.y / self.innerScrollView.frame.size.height;
-}
-
-- (CGPoint)contentOffsetAtPageIndex:(int)idx
-{
-    return CGPointMake(0.f, self.pageSize.height * idx);
+    return origin.y / self.pageSize.height;
 }
 
 @end
