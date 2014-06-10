@@ -40,12 +40,13 @@
 
 @end
 
+@interface InfinitePagingView()
+@property (nonatomic, strong) NSArray *defaultPageViews;
+@property (nonatomic, strong) NSMutableArray *pageViews;
+@property (nonatomic, assign) NSInteger lastIndexOfArray;
+@end
+
 @implementation InfinitePagingView
-{
-    NSArray *_defaultPageViews;
-    NSMutableArray *_pageViews;
-    NSInteger _lastIndexOfArray;
-}
 
 - (void)setFrame:(CGRect)frame
 {
@@ -73,62 +74,62 @@
 - (CGRect)scrollViewFrame
 {
     if (_scrollDirection == InfinitePagingViewHorizonScrollDirection) {
-        CGFloat left_margin = (self.frame.size.width - _pageSize.width) / 2;
-        return CGRectMake(left_margin, 0.f, _pageSize.width, self.frame.size.height);
+        CGFloat left_margin = (self.frame.size.width - self.pageSize.width) / 2;
+        return CGRectMake(left_margin, 0.f, self.pageSize.width, self.frame.size.height);
     } else {
-        CGFloat top_margin  = (self.frame.size.height - _pageSize.height) / 2;
-        return CGRectMake(0.f, top_margin, self.frame.size.width, _pageSize.height);
+        CGFloat top_margin  = (self.frame.size.height - self.pageSize.height) / 2;
+        return CGRectMake(0.f, top_margin, self.frame.size.width, self.pageSize.height);
     }
 }
 
 - (CGSize)scrollViewContentSize
 {
     if (_scrollDirection == InfinitePagingViewHorizonScrollDirection) {
-        return CGSizeMake(self.frame.size.width * _pageViews.count, self.frame.size.height);
+        return CGSizeMake(self.frame.size.width * self.pageViews.count, self.frame.size.height);
     } else {
-        return CGSizeMake(self.frame.size.width, self.frame.size.height * _pageViews.count);
+        return CGSizeMake(self.frame.size.width, self.frame.size.height * self.pageViews.count);
     }
 }
 
 - (CGPoint)pageViewCenterAtPageIndex:(int)idx
 {
     if (_scrollDirection == InfinitePagingViewHorizonScrollDirection) {
-        return CGPointMake(idx * (_innerScrollView.frame.size.width) + (_innerScrollView.frame.size.width / 2), _innerScrollView.center.y);
+        return CGPointMake(idx * (self.innerScrollView.frame.size.width) + (self.innerScrollView.frame.size.width / 2), self.innerScrollView.center.y);
     } else {
-        return CGPointMake(_innerScrollView.center.x, idx * (_innerScrollView.frame.size.height) + (_innerScrollView.frame.size.height / 2));
+        return CGPointMake(self.innerScrollView.center.x, idx * (self.innerScrollView.frame.size.height) + (self.innerScrollView.frame.size.height / 2));
     }
 }
 
 - (CGRect)rectToVisibleWithOffset:(NSInteger)moveDirection
 {
     if (_scrollDirection == InfinitePagingViewHorizonScrollDirection) {
-        if (0 != fmodf(_innerScrollView.contentOffset.x, _pageSize.width)) return CGRectNull;
-        return CGRectMake(_innerScrollView.contentOffset.x - _innerScrollView.frame.size.width * moveDirection,
-                          _innerScrollView.contentOffset.y,
-                          _innerScrollView.frame.size.width, _innerScrollView.frame.size.height);
+        if (0 != fmodf(self.innerScrollView.contentOffset.x, self.pageSize.width)) return CGRectNull;
+        return CGRectMake(self.innerScrollView.contentOffset.x - self.innerScrollView.frame.size.width * moveDirection,
+                          self.innerScrollView.contentOffset.y,
+                          self.innerScrollView.frame.size.width, self.innerScrollView.frame.size.height);
     } else {
-        if (0 != fmodf(_innerScrollView.contentOffset.y, _pageSize.height)) return CGRectNull;
-        return CGRectMake(_innerScrollView.contentOffset.x,
-                          _innerScrollView.contentOffset.y - _innerScrollView.frame.size.height * moveDirection,
-                          _innerScrollView.frame.size.width, _innerScrollView.frame.size.height);
+        if (0 != fmodf(self.innerScrollView.contentOffset.y, self.pageSize.height)) return CGRectNull;
+        return CGRectMake(self.innerScrollView.contentOffset.x,
+                          self.innerScrollView.contentOffset.y - self.innerScrollView.frame.size.height * moveDirection,
+                          self.innerScrollView.frame.size.width, self.innerScrollView.frame.size.height);
     }
 }
 
 - (NSInteger)pageIndexWithContentOffset:(CGPoint)offset
 {
     if (_scrollDirection == InfinitePagingViewHorizonScrollDirection) {
-        return offset.x / _innerScrollView.frame.size.width;
+        return offset.x / self.innerScrollView.frame.size.width;
     } else {
-        return offset.y / _innerScrollView.frame.size.height;
+        return offset.y / self.innerScrollView.frame.size.height;
     }
 }
 
 - (CGPoint)contentOffsetAtPageIndex:(int)idx
 {
     if (_scrollDirection == InfinitePagingViewHorizonScrollDirection) {
-        return CGPointMake(_pageSize.width * idx, 0.f);
+        return CGPointMake(self.pageSize.width * idx, 0.f);
     } else {
-        return CGPointMake(0.f, _pageSize.height * idx);
+        return CGPointMake(0.f, self.pageSize.height * idx);
     }
 }
 
