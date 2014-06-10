@@ -51,15 +51,6 @@
 @end
 
 /*!
- The direction of scroll.
- @typedef InfinitePagingViewScrollDirection
- */
-typedef enum {
-    InfinitePagingViewHorizonScrollDirection,
-    InfinitePagingViewVerticalScrollDirection,
-} InfinitePagingViewScrollDirection;
-
-/*!
  * @class InfinitePagingView
  * endlessly scrollable view.
  */
@@ -74,11 +65,6 @@ typedef enum {
  @var CGFloat width of inner page.
  */
 @property (nonatomic, assign) CGSize pageSize;
-
-/*!
- @var InfinitePagingViewScrollDirection
- */
-@property (nonatomic, assign) InfinitePagingViewScrollDirection scrollDirection;
 
 /*!
  @var NSInteger index of page views.
@@ -127,4 +113,8 @@ typedef enum {
 - (void)scrollToPage:(NSUInteger)pageIndex;
 
 
+@end
+
+
+@interface VerticalInfinitePagingView : InfinitePagingView
 @end

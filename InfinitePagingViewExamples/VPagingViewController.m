@@ -20,9 +20,8 @@
     self.view.backgroundColor = [UIColor underPageBackgroundColor];
     
     // pagingView
-    InfinitePagingView *pagingView = [[InfinitePagingView alloc] initWithFrame:CGRectMake(self.view.center.x - 100.f, 0.f, 200.f, self.view.frame.size.height - naviBarHeight)];
+    VerticalInfinitePagingView *pagingView = [[VerticalInfinitePagingView alloc] initWithFrame:CGRectMake(self.view.center.x - 100.f, 0.f, 200.f, self.view.frame.size.height - naviBarHeight)];
     pagingView.backgroundColor = [UIColor blackColor];
-    pagingView.scrollDirection = InfinitePagingViewVerticalScrollDirection;
     [self.view addSubview:pagingView];
     
     for (NSUInteger i = 1; i <= 15; ++i) {
