@@ -31,6 +31,15 @@
 
 #import "InfinitePagingView.h"
 
+@implementation IPScrollView
+
+- (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event
+{
+    return YES;
+}
+
+@end
+
 @implementation InfinitePagingView
 {
     NSArray *_defaultPageViews;
@@ -46,7 +55,7 @@
         _loopEnabled = YES;
         self.userInteractionEnabled = YES;
         self.clipsToBounds = YES;
-        _innerScrollView = [[UIScrollView alloc] initWithFrame:frame];
+        _innerScrollView = [[IPScrollView alloc] initWithFrame:frame];
         _innerScrollView.delegate = self;
         _innerScrollView.backgroundColor = [UIColor clearColor];
         _innerScrollView.clipsToBounds = NO;
@@ -58,15 +67,6 @@
         [self addSubview:_innerScrollView];
         self.pageSize = frame.size;
     }
-}
-
-- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event
-{
-    UIView *hitView = [super hitTest:point withEvent:event];
-    if (self == hitView) {
-        return _innerScrollView;
-    }
-    return hitView;
 }
 
 #pragma mark - Public methods

@@ -32,6 +32,10 @@
 
 #import <UIKit/UIKit.h>
 
+@interface IPScrollView : UIScrollView
+@end
+
+
 @class InfinitePagingView;
 
 /*!
@@ -89,7 +93,7 @@ typedef enum {
 /*!
  @var UIScrollView innerScrollView
  */
-@property (nonatomic, strong, readonly) UIScrollView *innerScrollView;
+@property (nonatomic, strong, readonly) IPScrollView *innerScrollView;
 
 /*!
  Let each pageView to do something.
