@@ -69,6 +69,19 @@
     }
 }
 
+-(NSInteger)offsetWithPageIndex:(int)targetPageIndex basePageIndex:(int)basePageIndex
+{
+    NSInteger offset = basePageIndex - targetPageIndex;
+    
+    if (offset < -floor(_pageViews.count / 2)) {
+        offset += _pageViews.count;
+    } else if (offset > floor(_pageViews.count / 2)) {
+        offset -= _pageViews.count;
+    }
+    
+    return offset;
+}
+
 #pragma mark - value affected by horizontal/vertical direction
 - (CGRect)scrollViewFrame
 {
@@ -122,6 +135,8 @@
     
     _pageViews = [_defaultPageViews mutableCopy];
     
+    _lastIndexOfArray = _currentPageIndex = floor(_pageViews.count / 2);
+    
     [self layoutPages];
 }
 
@@ -139,12 +154,8 @@
 
 - (void)scrollToPage:(NSUInteger)pageIndex
 {
-    NSInteger direction = _currentPageIndex-pageIndex;
-    if (direction < -floor(_pageViews.count / 2)) {
-        direction += _pageViews.count;
-    } else if (direction > floor(_pageViews.count / 2)) {
-        direction -= _pageViews.count;
-    }
+    NSInteger direction = [self offsetWithPageIndex:pageIndex basePageIndex:_currentPageIndex];
+    
     NSLog(@"last:%d current:%d target:%d direction:%d", _lastIndexOfArray, _currentPageIndex, pageIndex, direction);
     [self scrollToDirection:direction animated:YES];
     //[self performSelector:@selector(scrollViewDidEndDecelerating:) withObject:_innerScrollView afterDelay:0.5f]; // delay until scroll animation end.
@@ -168,8 +179,6 @@
         pageView.center = [self pageViewCenterAtPageIndex:idx];
         [_innerScrollView addSubview:pageView];
     }];
-    
-    _lastIndexOfArray = _currentPageIndex = floor(_pageViews.count / 2);
     
     _innerScrollView.contentOffset = [self contentOffsetAtPageIndex:_lastIndexOfArray];
 }
