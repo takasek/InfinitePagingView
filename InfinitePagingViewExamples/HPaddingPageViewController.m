@@ -83,7 +83,7 @@
                      cancelButtonTitle:@"OK"
                      otherButtonTitles:nil] show];
     
-    [_pagingView enumeratePageViewsUsingBlock:^(UIView *pageView, NSUInteger pageIndex, NSInteger currentPageIndex, BOOL *stop) {
+    [_pagingView enumeratePageViewsUsingBlock:^(UIView *pageView, NSUInteger pageIndex, NSUInteger currentPageIndex, BOOL *stop) {
         if (pageIndex == currentPageIndex) return;
         
         [UIView animateWithDuration:2.f animations:^{

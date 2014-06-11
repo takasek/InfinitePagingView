@@ -43,7 +43,7 @@
 - (void)pagingView:(InfinitePagingView *)pagingView didScroll:(UIScrollView *)scrollView;
 - (void)pagingView:(InfinitePagingView *)pagingView didEndDragging:(UIScrollView *)scrollView;
 - (void)pagingView:(InfinitePagingView *)pagingView willBeginDecelerating:(UIScrollView *)scrollView;
-- (void)pagingView:(InfinitePagingView *)pagingView didEndDecelerating:(UIScrollView *)scrollView atPageIndex:(NSInteger)pageIndex;
+- (void)pagingView:(InfinitePagingView *)pagingView didEndDecelerating:(UIScrollView *)scrollView atPageIndex:(NSUInteger)pageIndex;
 @end
 
 /*!
@@ -63,9 +63,9 @@
 @property (nonatomic, assign) CGSize pageSize;
 
 /*!
- @var NSInteger index of page views.
+ @var NSUInteger index of page views.
  */
-@property (nonatomic, assign, readonly) NSInteger currentPageIndex;
+@property (nonatomic, assign, readonly) NSUInteger currentPageIndex;
 
 /*!
  @var InfinitePagingViewDelegate
@@ -106,7 +106,7 @@
 /*!
  Let each pageView to do something.
  */
-- (void)enumeratePageViewsUsingBlock:(void (^)(UIView *pageView, NSUInteger pageIndex, NSInteger currentPageIndex, BOOL *stop))block;
+- (void)enumeratePageViewsUsingBlock:(void (^)(UIView *pageView, NSUInteger pageIndex, NSUInteger currentPageIndex, BOOL *stop))block;
 
 - (UIView *)pageViewAtIndex:(int)pageIndex;
 
