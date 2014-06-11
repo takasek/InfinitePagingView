@@ -218,6 +218,10 @@
     [_innerScrollView scrollRectToVisible:rect animated:animated];
 }
 
+-(void)setCurrentPageIndex:(NSUInteger)currentPageIndex
+{
+    [self reloadPageViewsWithPageIndex:currentPageIndex];
+}
 
 
 
@@ -260,20 +264,18 @@
 {
     NSUInteger pageIndex = [self pageIndexWithPageViewOrigin:_innerScrollView.contentOffset];
     [self reloadPageViewsWithPageIndex:pageIndex];
+    
+    if (nil != _delegate && [_delegate respondsToSelector:@selector(pagingView:didEndDecelerating:atPageIndex:)]) {
+        [_delegate pagingView:self didEndDecelerating:_innerScrollView atPageIndex:pageIndex];
+    }
 }
 
 -(void)reloadPageViewsWithPageIndex:(NSUInteger)pageIndex
 {
-    if (_currentPageIndex == pageIndex) return;
-    
     _currentPageIndex = pageIndex;
     
     if (_loopEnabled) {
         [self layoutPages];
-    }
-    
-    if (nil != _delegate && [_delegate respondsToSelector:@selector(pagingView:didEndDecelerating:atPageIndex:)]) {
-        [_delegate pagingView:self didEndDecelerating:_innerScrollView atPageIndex:_currentPageIndex];
     }
 }
 

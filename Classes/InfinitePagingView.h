@@ -65,7 +65,7 @@
 /*!
  @var NSUInteger index of page views.
  */
-@property (nonatomic, assign, readonly) NSUInteger currentPageIndex;
+@property (nonatomic, assign) NSUInteger currentPageIndex;
 
 /*!
  @var InfinitePagingViewDelegate
