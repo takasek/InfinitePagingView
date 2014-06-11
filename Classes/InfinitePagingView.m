@@ -31,6 +31,9 @@
 
 #import "InfinitePagingView.h"
 
+@interface IPScrollView : UIScrollView
+@end
+
 @implementation IPScrollView
 
 - (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event
@@ -43,6 +46,7 @@
 @interface InfinitePagingView()
 @property (nonatomic, strong) NSArray *defaultPageViews;
 @property (nonatomic, strong) NSArray *pageViews;
+@property (nonatomic, strong) IPScrollView *innerScrollView;
 @end
 
 @implementation InfinitePagingView
@@ -140,6 +144,12 @@
 
 
 #pragma mark - Public methods
+
+- (UIScrollView *)innerScrollView
+{
+    return _innerScrollView;
+}
+
 - (void)enumeratePageViewsUsingBlock:(void (^)(UIView *pageView, NSUInteger pageIndex, NSInteger currentPageIndex, BOOL *stop))block
 {
     [_defaultPageViews enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
