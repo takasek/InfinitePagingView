@@ -65,7 +65,7 @@
 /*!
  @var NSInteger index of page views.
  */
-@property (nonatomic, assign) NSInteger currentPageIndex;
+@property (nonatomic, assign, readonly) NSInteger currentPageIndex;
 
 /*!
  @var InfinitePagingViewDelegate
@@ -76,11 +76,6 @@
  @var UIScrollView innerScrollView
  */
 @property (nonatomic, strong, readonly) UIScrollView *innerScrollView;
-
-/*!
- Let each pageView to do something.
- */
-- (void)enumeratePageViewsUsingBlock:(void (^)(UIView *pageView, NSUInteger pageIndex, NSInteger currentPageIndex, BOOL *stop))block;
 
 /*!
  Add a view object to inner scrollView view.
@@ -107,6 +102,13 @@
  @param NSUInteger pageIndex
  */
 - (void)scrollToPage:(NSUInteger)pageIndex;
+
+/*!
+ Let each pageView to do something.
+ */
+- (void)enumeratePageViewsUsingBlock:(void (^)(UIView *pageView, NSUInteger pageIndex, NSInteger currentPageIndex, BOOL *stop))block;
+
+- (UIView *)pageViewAtIndex:(int)pageIndex;
 
 
 @end
