@@ -44,7 +44,6 @@
 @end
 
 @interface InfinitePagingView()
-@property (nonatomic, strong) NSArray *defaultPageViews;
 @property (nonatomic, strong) NSArray *pageViews;
 @property (nonatomic, strong) IPScrollView *innerScrollView;
 @end
@@ -152,36 +151,26 @@
 
 - (void)enumeratePageViewsUsingBlock:(void (^)(UIView *pageView, NSUInteger pageIndex, NSInteger currentPageIndex, BOOL *stop))block
 {
-    [_defaultPageViews enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+    [_pageViews enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         block(obj, idx, _currentPageIndex, stop);
     }];
 }
 
 - (void)addPageView:(UIView *)pageView
 {
-    if (nil == _defaultPageViews) {
-        _defaultPageViews = [NSArray array];
-    }
-    
-    _defaultPageViews = [_defaultPageViews arrayByAddingObject:pageView];
-    
-    _pageViews = [_defaultPageViews mutableCopy];
-    
-    _currentPageIndex = 0; //floor(_pageViews.count / 2);
+    _pageViews = [(_pageViews ? _pageViews : [NSArray array]) arrayByAddingObject:pageView];
     
     [self layoutPages];
 }
 
 - (void)scrollToPreviousPage
 {
-    [self scrollToDirection:1 animated:YES];
-    //[self performSelector:@selector(scrollViewDidEndDecelerating:) withObject:_innerScrollView afterDelay:0.5f]; // delay until scroll animation end.
+    [self scrollToPage:[self shiftedPageIndex:_currentPageIndex offset:+1] animated:YES];
 }
 
 - (void)scrollToNextPage
 {
-    [self scrollToDirection:-1 animated:YES];
-    //[self performSelector:@selector(scrollViewDidEndDecelerating:) withObject:_innerScrollView afterDelay:0.5f]; // delay until scroll animation end.
+    [self scrollToPage:[self shiftedPageIndex:_currentPageIndex offset:-1] animated:YES];
 }
 
 - (void)scrollToPage:(NSUInteger)pageIndex
@@ -214,11 +203,6 @@
         });
         [weakScrollView addSubview:pageView];
     }];
-}
-
-- (void)scrollToDirection:(NSInteger)moveDirection animated:(BOOL)animated
-{
-    [self scrollToPage:[self shiftedPageIndex:_currentPageIndex offset:moveDirection] animated:animated];
 }
 
 - (void)scrollToPage:(NSInteger)pageIndex animated:(BOOL)animated
