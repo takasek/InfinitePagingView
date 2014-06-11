@@ -71,7 +71,7 @@
     }
 }
 
--(NSInteger)shiftedPageIndex:(int)baseIndex offset:(int)offset
+-(NSUInteger)shiftedPageIndex:(NSUInteger)baseIndex offset:(NSInteger)offset
 {
     NSInteger result = baseIndex + offset;
     
@@ -84,7 +84,7 @@
     return result;
 }
 
--(NSInteger)offsetWithPageIndex:(int)targetPageIndex basePageIndex:(int)basePageIndex
+-(NSInteger)offsetWithPageIndex:(NSUInteger)targetPageIndex basePageIndex:(NSUInteger)basePageIndex
 {
     NSInteger offset = targetPageIndex - basePageIndex;
     
@@ -97,22 +97,22 @@
     return offset;
 }
 
--(NSInteger)viewOrderWithPageIndex:(NSInteger)pageIndex
+-(NSUInteger)viewOrderWithPageIndex:(NSUInteger)pageIndex
 {
     if (!_loopEnabled) return pageIndex;
     
     NSInteger offset = [self offsetWithPageIndex:pageIndex basePageIndex:self.currentPageIndex];
-    NSInteger orderOfCurrentPageIndex = floor(self.pageViews.count/2);
+    NSUInteger orderOfCurrentPageIndex = floor(self.pageViews.count/2);
     return orderOfCurrentPageIndex + offset;
 }
 
-- (NSInteger)pageIndexWithPageViewOrigin:(CGPoint)origin
+- (NSUInteger)pageIndexWithPageViewOrigin:(CGPoint)origin
 {
-    NSInteger order = [self pageOrderWithPageViewOrigin:origin];
+    NSUInteger order = [self pageOrderWithPageViewOrigin:origin];
 
     if (!_loopEnabled) return order;
     
-    NSInteger orderOfCurrentPageIndex = floor(self.pageViews.count/2);
+    NSUInteger orderOfCurrentPageIndex = floor(self.pageViews.count/2);
     return [self shiftedPageIndex:_currentPageIndex offset:(order-orderOfCurrentPageIndex)];
 }
 
@@ -130,12 +130,12 @@
     return CGSizeMake(self.pageSize.width * self.pageViews.count, self.frame.size.height);
 }
 
-- (CGPoint)pageViewOriginAtPageIndex:(int)pageIndex
+- (CGPoint)pageViewOriginAtPageIndex:(NSUInteger)pageIndex
 {
     return CGPointMake(self.pageSize.width * [self viewOrderWithPageIndex:pageIndex], 0.f);
 }
 
-- (NSInteger)pageOrderWithPageViewOrigin:(CGPoint)origin
+- (NSUInteger)pageOrderWithPageViewOrigin:(CGPoint)origin
 {
     return origin.x / self.pageSize.width;
 }
@@ -171,14 +171,14 @@
     [self scrollToPage:pageIndex animated:YES];
 }
 
-- (void)enumeratePageViewsUsingBlock:(void (^)(UIView *pageView, NSUInteger pageIndex, NSInteger currentPageIndex, BOOL *stop))block
+- (void)enumeratePageViewsUsingBlock:(void (^)(UIView *pageView, NSUInteger pageIndex, NSUInteger currentPageIndex, BOOL *stop))block
 {
     [_pageViews enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         block(obj, idx, _currentPageIndex, stop);
     }];
 }
 
-- (UIView *)pageViewAtIndex:(int)pageIndex
+- (UIView *)pageViewAtIndex:(NSUInteger)pageIndex
 {
     return [_pageViews objectAtIndex:pageIndex];
 }
@@ -209,7 +209,7 @@
     }];
 }
 
-- (void)scrollToPage:(NSInteger)pageIndex animated:(BOOL)animated
+- (void)scrollToPage:(NSUInteger)pageIndex animated:(BOOL)animated
 {
     CGRect rect = CGRectZero;
     rect.origin = [self pageViewOriginAtPageIndex:pageIndex];
@@ -258,11 +258,11 @@
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
-    NSInteger pageIndex = [self pageIndexWithPageViewOrigin:_innerScrollView.contentOffset];
+    NSUInteger pageIndex = [self pageIndexWithPageViewOrigin:_innerScrollView.contentOffset];
     [self reloadPageViewsWithPageIndex:pageIndex];
 }
 
--(void)reloadPageViewsWithPageIndex:(NSInteger)pageIndex
+-(void)reloadPageViewsWithPageIndex:(NSUInteger)pageIndex
 {
     if (_currentPageIndex == pageIndex) return;
     
@@ -292,12 +292,12 @@
     return CGSizeMake(self.pageSize.width, self.frame.size.height * self.pageViews.count);
 }
 
-- (CGPoint)pageViewOriginAtPageIndex:(int)pageIndex
+- (CGPoint)pageViewOriginAtPageIndex:(NSUInteger)pageIndex
 {
     return CGPointMake(0.f, self.pageSize.height * [self viewOrderWithPageIndex:pageIndex]);
 }
 
-- (NSInteger)pageOrderWithPageViewOrigin:(CGPoint)origin
+- (NSUInteger)pageOrderWithPageViewOrigin:(CGPoint)origin
 {
     return origin.y / self.pageSize.height;
 }
