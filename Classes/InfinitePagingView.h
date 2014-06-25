@@ -109,7 +109,7 @@
  */
 - (void)enumeratePageViewsUsingBlock:(void (^)(UIView *pageView, NSUInteger pageIndex, NSUInteger currentPageIndex, BOOL *stop))block;
 
-- (UIView *)pageViewAtIndex:(int)pageIndex;
+- (UIView *)pageViewAtIndex:(NSUInteger)pageIndex;
 
 
 @end
