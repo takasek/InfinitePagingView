@@ -39,6 +39,7 @@
  */
 @protocol InfinitePagingViewDelegate <NSObject>
 @optional
+- (void)pagingViewDidLayoutPages:(InfinitePagingView *)pagingView;
 - (void)pagingView:(InfinitePagingView *)pagingView willBeginDragging:(UIScrollView *)scrollView;
 - (void)pagingView:(InfinitePagingView *)pagingView didScroll:(UIScrollView *)scrollView;
 - (void)pagingView:(InfinitePagingView *)pagingView didEndDragging:(UIScrollView *)scrollView;

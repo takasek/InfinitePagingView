@@ -207,6 +207,10 @@
         });
         [weakScrollView addSubview:pageView];
     }];
+    
+    if (nil != _delegate && [_delegate respondsToSelector:@selector(pagingViewDidLayoutPages:)]) {
+        [_delegate pagingViewDidLayoutPages:self];
+    }
 }
 
 - (void)scrollToPage:(NSUInteger)pageIndex animated:(BOOL)animated
