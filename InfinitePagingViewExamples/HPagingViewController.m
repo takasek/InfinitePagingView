@@ -77,7 +77,7 @@
 
 #pragma mark - InfinitePagingViewDelegate
 
-- (void)pagingView:(InfinitePagingView *)pagingView didEndDecelerating:(UIScrollView *)scrollView atPageIndex:(NSInteger)pageIndex
+- (void)pagingView:(InfinitePagingView *)pagingView didSetPageIndex:(NSUInteger)pageIndex
 {
     pageControl.currentPage = pageIndex;
 }

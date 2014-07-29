@@ -229,6 +229,10 @@
     if (_loopEnabled) {
         [self layoutPages];
     }
+    
+    if (nil != _delegate && [_delegate respondsToSelector:@selector(pagingView:didSetPageIndex:)]) {
+        [_delegate pagingView:self didSetPageIndex:currentPageIndex];
+    }
 }
 
 
@@ -270,12 +274,12 @@
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
+    if (nil != _delegate && [_delegate respondsToSelector:@selector(pagingView:didEndDecelerating:atPageIndex:)]) {
+        [_delegate pagingView:self didEndDecelerating:_innerScrollView];
+    }
+    
     NSUInteger pageIndex = [self pageIndexWithPageViewOrigin:_innerScrollView.contentOffset];
     self.currentPageIndex = pageIndex;
-    
-    if (nil != _delegate && [_delegate respondsToSelector:@selector(pagingView:didEndDecelerating:atPageIndex:)]) {
-        [_delegate pagingView:self didEndDecelerating:_innerScrollView atPageIndex:pageIndex];
-    }
 }
 
 @end
