@@ -55,14 +55,14 @@
 @interface InfinitePagingView : UIView <UIScrollViewDelegate>
 
 /*!
- @var BOOL deactivates looping. (default = YES)
+ @var BOOL activates looping. (default = YES)
  */
 @property (nonatomic, assign) BOOL loopEnabled;
 
 /*!
  @var CGFloat width of inner page.
  */
-@property (nonatomic, assign) CGSize pageSize;
+@property (nonatomic, assign) CGSize defaultPageSize;
 
 /*!
  @var NSUInteger index of page views.
@@ -85,6 +85,14 @@
  @param UIView *pageView
  */
 - (void)addPageView:(UIView *)pageView;
+
+/*!
+ Add a view object to inner scrollView view and page size for the view.
+ @method addPageView:
+ @param UIView *pageView
+ @param CGSize pageSize
+ */
+- (void)addPageView:(UIView *)pageView pageSize:(CGSize)pageSize;
 
 /*!
  Scroll to previous page.

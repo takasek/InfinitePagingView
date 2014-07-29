@@ -45,6 +45,7 @@
 
 @interface InfinitePagingView()
 @property (nonatomic, strong) NSArray *pageViews;
+@property (nonatomic, strong) NSArray *pageSizes;
 @property (nonatomic, strong) IPScrollView *innerScrollView;
 @end
 
@@ -67,8 +68,32 @@
         _innerScrollView.showsHorizontalScrollIndicator = NO;
         _innerScrollView.showsVerticalScrollIndicator = NO;
         [self addSubview:_innerScrollView];
-        _pageSize = frame.size;
+        _defaultPageSize = frame.size;
     }
+}
+
+- (void)setPageSize:(CGSize)pageSize
+{
+    _defaultPageSize = pageSize;
+    
+    NSMutableArray *newPageSizes = @[].mutableCopy;
+    for (int i=0; i<_pageSizes.count; i++) {
+        [newPageSizes addObject:[NSValue valueWithCGSize:pageSize]];
+    }
+    [self setPageSizes:newPageSizes.copy];
+}
+
+- (CGSize)pageSize
+{
+    return _defaultPageSize;
+}
+
+- (CGSize)pageSizeAtIndex:(NSUInteger)index
+{
+    if (!_pageSizes) {
+        return _defaultPageSize;
+    }
+    return [(NSValue*)_pageSizes[index] CGSizeValue];
 }
 
 -(NSUInteger)shiftedPageIndex:(NSUInteger)baseIndex offset:(NSInteger)offset
@@ -162,7 +187,13 @@
 
 - (void)addPageView:(UIView *)pageView
 {
-    _pageViews = [(_pageViews ? _pageViews : [NSArray array]) arrayByAddingObject:pageView];
+    [self addPageView:pageView pageSize:_defaultPageSize];
+}
+
+- (void)addPageView:(UIView *)pageView pageSize:(CGSize)pageSize
+{
+    _pageViews = [(_pageViews ? _pageViews : @[]) arrayByAddingObject:pageView];
+    _pageSizes = [(_pageSizes ? _pageSizes : @[]) arrayByAddingObject:[NSValue valueWithCGSize:pageSize]];
     
     [self layoutPages];
 }
