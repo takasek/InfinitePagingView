@@ -62,7 +62,7 @@
         _innerScrollView.delegate = self;
         _innerScrollView.backgroundColor = [UIColor clearColor];
         _innerScrollView.clipsToBounds = NO;
-        _innerScrollView.pagingEnabled = YES;
+        _innerScrollView.pagingEnabled = NO; //manages paging by itself
         _innerScrollView.scrollEnabled = YES;
         _innerScrollView.showsHorizontalScrollIndicator = NO;
         _innerScrollView.showsVerticalScrollIndicator = NO;
@@ -108,7 +108,18 @@
 
 - (NSUInteger)pageIndexWithPageViewOrigin:(CGPoint)origin
 {
-    NSUInteger order = [self pageOrderWithPageViewOrigin:origin];
+    CGPoint center = ({
+        CGPoint point = _innerScrollView.contentOffset;
+        point.x += self.pageSize.width/2;
+        point.y += self.pageSize.height/2;
+        point;
+    });
+    return [self pageIndexWithPointInContent:center];
+}
+
+- (NSUInteger)pageIndexWithPointInContent:(CGPoint)point
+{
+    NSUInteger order = [self pageOrderWithPointInContent:point];
 
     if (!_loopEnabled) return order;
     
@@ -135,9 +146,9 @@
     return CGPointMake(self.pageSize.width * [self viewOrderWithPageIndex:pageIndex], 0.f);
 }
 
-- (NSUInteger)pageOrderWithPageViewOrigin:(CGPoint)origin
+- (NSUInteger)pageOrderWithPointInContent:(CGPoint)point
 {
-    return origin.x / self.pageSize.width;
+    return point.x / self.pageSize.width;
 }
 
 
@@ -224,6 +235,8 @@
 
 -(void)setCurrentPageIndex:(NSUInteger)currentPageIndex
 {
+    if (_currentPageIndex == currentPageIndex) return;
+    
     _currentPageIndex = currentPageIndex;
     
     if (_loopEnabled) {
@@ -235,7 +248,11 @@
     }
 }
 
-
+- (void)fixScrollViewToNearestPage
+{
+    NSUInteger pageIndex = [self pageIndexWithPageViewOrigin:_innerScrollView.contentOffset];
+    [self scrollToPage:pageIndex animated:YES];
+}
 
 #pragma mark - UIScrollViewDelegate methods
 
@@ -258,18 +275,14 @@
     if (nil != _delegate && [_delegate respondsToSelector:@selector(pagingView:didEndDragging:)]) {
         [_delegate pagingView:self didEndDragging:_innerScrollView];
     }
+    
+    [self performSelector:@selector(fixScrollViewToNearestPage) withObject:nil afterDelay:0.0];
 }
 
 - (void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView
 {
-    if (nil != _delegate && [_delegate respondsToSelector:@selector(pagingView:willBeginDecelerating:)]) {
-        [_delegate pagingView:self willBeginDecelerating:_innerScrollView];
-    }
-}
-
-- (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView
-{
-    [self scrollViewDidEndDecelerating:_innerScrollView];
+    //invalidate decelerating
+    [scrollView setContentOffset:scrollView.contentOffset animated:NO];
 }
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
@@ -277,10 +290,14 @@
     if (nil != _delegate && [_delegate respondsToSelector:@selector(pagingView:didEndDecelerating:atPageIndex:)]) {
         [_delegate pagingView:self didEndDecelerating:_innerScrollView];
     }
-    
-    NSUInteger pageIndex = [self pageIndexWithPageViewOrigin:_innerScrollView.contentOffset];
-    self.currentPageIndex = pageIndex;
 }
+
+- (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView
+{
+    NSUInteger pageIndex = [self pageIndexWithPageViewOrigin:_innerScrollView.contentOffset];
+    [self setCurrentPageIndex:pageIndex];
+}
+     
 
 @end
 
@@ -302,9 +319,9 @@
     return CGPointMake(0.f, self.pageSize.height * [self viewOrderWithPageIndex:pageIndex]);
 }
 
-- (NSUInteger)pageOrderWithPageViewOrigin:(CGPoint)origin
+- (NSUInteger)pageOrderWithPointInContent:(CGPoint)point
 {
-    return origin.y / self.pageSize.height;
+    return point.y / self.pageSize.height;
 }
 
 @end
