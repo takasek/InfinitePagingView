@@ -26,7 +26,7 @@
     // pagingView
     InfinitePagingView *pagingView = [[InfinitePagingView alloc] initWithFrame:CGRectMake(0.f, self.view.center.y - 100 - naviBarHeight, self.view.frame.size.width, 200.f)];
     pagingView.backgroundColor = [UIColor blackColor];
-    pagingView.defaultPageSize = CGSizeMake(120.f, 200.f);
+    [pagingView setPageSize:CGSizeMake(120.f, 200.f)];
     [self.view addSubview:pagingView];
     
     for (NSUInteger i = 0; i < 15; ++i) {

@@ -62,7 +62,7 @@
 /*!
  @var CGFloat width of inner page.
  */
-@property (nonatomic, assign) CGSize defaultPageSize;
+@property (nonatomic, assign, readonly) CGSize defaultPageSize;
 
 /*!
  @var NSUInteger index of page views.
@@ -78,6 +78,8 @@
  @var UIScrollView innerScrollView
  */
 @property (nonatomic, strong, readonly) UIScrollView *innerScrollView;
+
+- (void)setPageSize:(CGSize)pageSize;
 
 /*!
  Add a view object to inner scrollView view.
