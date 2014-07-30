@@ -46,7 +46,6 @@
 @interface InfinitePagingView()
 @property (nonatomic, assign) CGSize defaultPageSize;
 @property (nonatomic, assign) CGSize maximumPageSize;
-@property (nonatomic, assign) BOOL sizeFixingEnabled;
 
 @property (nonatomic, strong) NSArray *pageViews;
 @property (nonatomic, strong) NSArray *pageSizes;
@@ -89,7 +88,25 @@
 
 - (CGSize)pageSizeAtIndex:(NSUInteger)index
 {
-    return [(NSValue*)_pageSizes[index] CGSizeValue];
+    return (_loopEnabled) ? [(NSValue*)_pageSizes[index] CGSizeValue] : _maximumPageSize;
+}
+
+- (CGRect)pageViewFrameAtPageIndex:(NSUInteger)pageIndex ofContent:(BOOL)ofContent
+{
+    if (!self.pageViews.count) return CGRectZero;
+    
+    CGRect result = CGRectZero;
+    result.origin = [self pageOriginAtIndex:pageIndex];
+    result.size = [self pageSizeAtIndex:pageIndex];
+    
+    if (ofContent) {
+        CGSize mySize = [self pageViewAtIndex:pageIndex].frame.size;
+        result.origin.x += (result.size.width - mySize.width) / 2;
+        result.origin.y += (result.size.height - mySize.height) / 2;
+        result.size = mySize;
+    }
+    
+    return result;
 }
 
 -(NSUInteger)shiftedPageIndex:(NSUInteger)baseIndex offset:(NSInteger)offset
@@ -127,7 +144,7 @@
     return orderOfCurrentPageIndex + offset;
 }
 
-- (NSUInteger)pageIndexWithPageViewOrigin:(CGPoint)origin
+- (NSUInteger)pageIndexShownCurrently
 {
     CGPoint center = ({
         CGPoint point = _innerScrollView.contentOffset;
@@ -150,13 +167,12 @@
 }
 
 
-
 #pragma mark - value affected by horizontal/vertical direction
 - (CGRect)scrollViewFrame
 {
     CGFloat currentPageWidth = [self pageSizeAtIndex:_currentPageIndex].width;
-    CGFloat left_margin = (self.frame.size.width - currentPageWidth) / 2;
-    return CGRectMake(left_margin, 0.f, currentPageWidth, self.frame.size.height);
+    CGSize selfSize = self.frame.size;
+    return CGRectMake((selfSize.width-currentPageWidth)/2, 0, currentPageWidth, selfSize.height);
 }
 
 - (CGSize)scrollViewContentSize
@@ -168,35 +184,27 @@
     return size;
 }
 
-- (CGRect)pageViewFrameAtPageIndex:(NSUInteger)pageIndex ofContent:(BOOL)ofContent
+- (CGPoint)pageOriginAtIndex:(NSUInteger)pageIndex
 {
-    if (!self.pageViews.count) return CGRectZero;
-
-    CGRect result = CGRectZero;
-    result.size = [self pageSizeAtIndex:pageIndex];
+    CGPoint result = CGPointZero;
     
-    NSInteger youngerIndex = [self shiftedPageIndex:pageIndex offset:-1];
-    for (NSInteger i=[self viewOrderWithPageIndex:pageIndex]-1; i>=0; i--) {
-        result.origin.x += [self pageSizeAtIndex:youngerIndex].width;
-        youngerIndex = [self shiftedPageIndex:youngerIndex offset:-1];
-    }
-    if (ofContent) {
-        CGSize mySize = [self pageViewAtIndex:pageIndex].frame.size;
-        result.origin.x += (result.size.width - mySize.width) / 2;
-        result.origin.y += (result.size.height - mySize.height) / 2;
-        result.size = mySize;
+    if (_loopEnabled) {
+        NSInteger i = pageIndex;
+        while ([self viewOrderWithPageIndex:i] > 0) {
+            result.x += [self pageSizeAtIndex:i].width;
+            i = [self shiftedPageIndex:i offset:-1];
+        }
+    } else {
+        result.x = pageIndex * _maximumPageSize.width;
     }
     
     return result;
 }
 
 
-#pragma mark - Public methods
 
-- (UIScrollView *)innerScrollView
-{
-    return _innerScrollView;
-}
+
+#pragma mark - Public methods
 
 - (void)addPageView:(UIView *)pageView
 {
@@ -253,12 +261,11 @@
 {
     _innerScrollView.frame = [self scrollViewFrame];
     _innerScrollView.contentSize = [self scrollViewContentSize];
-    _innerScrollView.contentOffset = [self pageViewFrameAtPageIndex:_currentPageIndex ofContent:NO].origin;
+    _innerScrollView.contentOffset = [self pageOriginAtIndex:_currentPageIndex];
     
-    __block UIScrollView *weakScrollView = _innerScrollView;
     [_pageViews enumerateObjectsUsingBlock:^(UIView *pageView, NSUInteger idx, BOOL *stop) {
         pageView.frame = [self pageViewFrameAtPageIndex:idx ofContent:YES];
-        [weakScrollView addSubview:pageView];
+        [_innerScrollView addSubview:pageView];
     }];
     
     if (nil != _delegate && [_delegate respondsToSelector:@selector(pagingViewDidLayoutPages:)]) {
@@ -286,12 +293,6 @@
     }
 }
 
-- (void)fixScrollViewToNearestPage
-{
-    NSUInteger pageIndex = [self pageIndexWithPageViewOrigin:_innerScrollView.contentOffset];
-    [self scrollToPage:pageIndex animated:YES];
-}
-
 #pragma mark - UIScrollViewDelegate methods
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
@@ -314,7 +315,9 @@
         [_delegate pagingView:self didEndDragging:_innerScrollView];
     }
     
-    [self performSelector:@selector(fixScrollViewToNearestPage) withObject:nil afterDelay:0.0];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self scrollToPage:[self pageIndexShownCurrently] animated:YES];
+    });
 }
 
 - (void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView
@@ -332,10 +335,8 @@
 
 - (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView
 {
-    NSUInteger pageIndex = [self pageIndexWithPageViewOrigin:_innerScrollView.contentOffset];
-    [self setCurrentPageIndex:pageIndex];
+    [self setCurrentPageIndex:[self pageIndexShownCurrently]];
 }
-     
 
 @end
 
@@ -344,8 +345,8 @@
 - (CGRect)scrollViewFrame
 {
     CGFloat currentPageHeight = [self pageSizeAtIndex:self.currentPageIndex].height;
-    CGFloat top_margin = (self.frame.size.height - currentPageHeight) / 2;
-    return CGRectMake(0.f, top_margin, self.frame.size.width, currentPageHeight);
+    CGSize selfSize = self.frame.size;
+    return CGRectMake(0, (selfSize.height-currentPageHeight)/2, selfSize.width, currentPageHeight);
 }
 
 - (CGSize)scrollViewContentSize
@@ -357,23 +358,18 @@
     return size;
 }
 
-- (CGRect)pageViewFrameAtPageIndex:(NSUInteger)pageIndex ofContent:(BOOL)ofContent
+- (CGPoint)pageOriginAtIndex:(NSUInteger)pageIndex
 {
-    if (!self.pageViews.count) return CGRectZero;
+    CGPoint result = CGPointZero;
     
-    CGRect result = CGRectZero;
-    result.size = [self pageSizeAtIndex:pageIndex];
-    
-    NSInteger youngerIndex = [self shiftedPageIndex:pageIndex offset:-1];
-    for (NSInteger i=[self viewOrderWithPageIndex:pageIndex]-1; i>=0; i--) {
-        result.origin.y += [self pageSizeAtIndex:youngerIndex].height;
-        youngerIndex = [self shiftedPageIndex:youngerIndex offset:-1];
-    }
-    if (ofContent) {
-        CGSize mySize = [self pageViewAtIndex:pageIndex].frame.size;
-        result.origin.x += (result.size.width - mySize.width) / 2;
-        result.origin.y += (result.size.height - mySize.height) / 2;
-        result.size = mySize;
+    if (self.loopEnabled) {
+        NSInteger i = pageIndex;
+        while ([self viewOrderWithPageIndex:i] > 0) {
+            result.y += [self pageSizeAtIndex:i].height;
+            i = [self shiftedPageIndex:i offset:-1];
+        }
+    } else {
+        result.y = pageIndex * self.maximumPageSize.height;
     }
     
     return result;
