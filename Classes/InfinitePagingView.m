@@ -75,6 +75,28 @@
     }
 }
 
+- (void)addPageView:(UIView *)pageView
+{
+    [self addPageView:pageView pageSize:_defaultPageSize];
+}
+
+- (void)addPageView:(UIView *)pageView pageSize:(CGSize)pageSize
+{
+    _pageViews = [(_pageViews ?: @[]) arrayByAddingObject:pageView];
+    _pageSizes = [(_pageSizes ?: @[]) arrayByAddingObject:[NSValue valueWithCGSize:pageSize]];
+    
+    if (CGSizeEqualToSize(_defaultPageSize, CGSizeZero)) {
+        _maximumPageSize = CGSizeMake(MAX(_maximumPageSize.width, pageSize.width),
+                                      MAX(_maximumPageSize.height, pageSize.height));
+    }
+    [self setNeedsLayout];
+}
+
+- (UIView *)pageViewAtIndex:(NSUInteger)pageIndex
+{
+    return [_pageViews objectAtIndex:pageIndex];
+}
+
 - (void)setPageSize:(CGSize)pageSize
 {
     _defaultPageSize = _maximumPageSize = pageSize;
@@ -195,15 +217,6 @@
     }
 }
 
-- (void)scrollToPage:(NSUInteger)pageIndex animated:(BOOL)animated
-{
-    if (animated) {
-        [_innerScrollView scrollRectToVisible:[self pageViewFrameAtPageIndex:pageIndex ofContent:NO] animated:YES];
-    } else {
-        [self setCurrentPageIndex:pageIndex animated:NO];
-    }
-}
-
 -(void)setCurrentPageIndex:(NSUInteger)currentPageIndex animated:(BOOL)animated
 {
     if (_currentPageIndex == currentPageIndex) return;
@@ -220,24 +233,6 @@
 }
 
 
-#pragma mark - Public methods
-
-- (void)addPageView:(UIView *)pageView
-{
-    [self addPageView:pageView pageSize:_defaultPageSize];
-}
-
-- (void)addPageView:(UIView *)pageView pageSize:(CGSize)pageSize
-{
-    _pageViews = [(_pageViews ? _pageViews : @[]) arrayByAddingObject:pageView];
-    _pageSizes = [(_pageSizes ? _pageSizes : @[]) arrayByAddingObject:[NSValue valueWithCGSize:pageSize]];
-    
-    if (CGSizeEqualToSize(_defaultPageSize, CGSizeZero))
-        _maximumPageSize = CGSizeMake(MAX(_maximumPageSize.width, pageSize.width),
-                                      MAX(_maximumPageSize.height, pageSize.height));
-    [self setNeedsLayout];
-}
-
 - (void)scrollToPreviousPage
 {
     [self scrollToPage:[self shiftedPageIndex:_currentPageIndex offset:+1] animated:YES];
@@ -253,16 +248,20 @@
     [self scrollToPage:pageIndex animated:YES];
 }
 
+- (void)scrollToPage:(NSUInteger)pageIndex animated:(BOOL)animated
+{
+    if (animated) {
+        [_innerScrollView scrollRectToVisible:[self pageViewFrameAtPageIndex:pageIndex ofContent:NO] animated:YES];
+    } else {
+        [self setCurrentPageIndex:pageIndex animated:NO];
+    }
+}
+
 - (void)enumeratePageViewsUsingBlock:(void (^)(UIView *pageView, NSUInteger pageIndex, NSUInteger currentPageIndex, BOOL *stop))block
 {
     [_pageViews enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         block(obj, idx, _currentPageIndex, stop);
     }];
-}
-
-- (UIView *)pageViewAtIndex:(NSUInteger)pageIndex
-{
-    return [_pageViews objectAtIndex:pageIndex];
 }
 
 
