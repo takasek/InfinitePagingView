@@ -173,6 +173,53 @@
 }
 
 
+- (void)layoutSubviews
+{
+    [super layoutSubviews];
+    [self layoutPages];
+}
+
+- (void)layoutPages
+{
+    _innerScrollView.frame = [self scrollViewFrame];
+    _innerScrollView.contentSize = [self scrollViewContentSize];
+    _innerScrollView.contentOffset = [self pageOriginAtIndex:_currentPageIndex];
+    
+    [_pageViews enumerateObjectsUsingBlock:^(UIView *pageView, NSUInteger idx, BOOL *stop) {
+        pageView.frame = [self pageViewFrameAtPageIndex:idx ofContent:YES];
+        [_innerScrollView addSubview:pageView];
+    }];
+    
+    if (nil != _delegate && [_delegate respondsToSelector:@selector(pagingViewDidLayoutPages:)]) {
+        [_delegate pagingViewDidLayoutPages:self];
+    }
+}
+
+- (void)scrollToPage:(NSUInteger)pageIndex animated:(BOOL)animated
+{
+    if (animated) {
+        [_innerScrollView scrollRectToVisible:[self pageViewFrameAtPageIndex:pageIndex ofContent:NO] animated:YES];
+    } else {
+        [self setCurrentPageIndex:pageIndex animated:NO];
+    }
+}
+
+-(void)setCurrentPageIndex:(NSUInteger)currentPageIndex animated:(BOOL)animated
+{
+    if (_currentPageIndex == currentPageIndex) return;
+    
+    _currentPageIndex = currentPageIndex;
+    
+    if (_loopEnabled) {
+        [self layoutPages];
+    }
+    
+    if (nil != _delegate && [_delegate respondsToSelector:@selector(pagingView:didSetPageIndex:animated:)]) {
+        [_delegate pagingView:self didSetPageIndex:currentPageIndex animated:animated];
+    }
+}
+
+
 #pragma mark - Public methods
 
 - (void)addPageView:(UIView *)pageView
@@ -219,53 +266,6 @@
     return [_pageViews objectAtIndex:pageIndex];
 }
 
-#pragma mark - Private methods
-
-- (void)layoutSubviews
-{
-    [super layoutSubviews];
-    [self layoutPages];
-}
-
-- (void)layoutPages
-{
-    _innerScrollView.frame = [self scrollViewFrame];
-    _innerScrollView.contentSize = [self scrollViewContentSize];
-    _innerScrollView.contentOffset = [self pageOriginAtIndex:_currentPageIndex];
-    
-    [_pageViews enumerateObjectsUsingBlock:^(UIView *pageView, NSUInteger idx, BOOL *stop) {
-        pageView.frame = [self pageViewFrameAtPageIndex:idx ofContent:YES];
-        [_innerScrollView addSubview:pageView];
-    }];
-    
-    if (nil != _delegate && [_delegate respondsToSelector:@selector(pagingViewDidLayoutPages:)]) {
-        [_delegate pagingViewDidLayoutPages:self];
-    }
-}
-
-- (void)scrollToPage:(NSUInteger)pageIndex animated:(BOOL)animated
-{
-    if (animated) {
-        [_innerScrollView scrollRectToVisible:[self pageViewFrameAtPageIndex:pageIndex ofContent:NO] animated:YES];
-    } else {
-        [self setCurrentPageIndex:pageIndex animated:NO];
-    }
-}
-
--(void)setCurrentPageIndex:(NSUInteger)currentPageIndex animated:(BOOL)animated
-{
-    if (_currentPageIndex == currentPageIndex) return;
-    
-    _currentPageIndex = currentPageIndex;
-    
-    if (_loopEnabled) {
-        [self layoutPages];
-    }
-    
-    if (nil != _delegate && [_delegate respondsToSelector:@selector(pagingView:didSetPageIndex:animated:)]) {
-        [_delegate pagingView:self didSetPageIndex:currentPageIndex animated:animated];
-    }
-}
 
 #pragma mark - UIScrollViewDelegate methods
 
