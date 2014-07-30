@@ -243,14 +243,16 @@
 {
     if (_currentPageIndex == currentPageIndex) return;
     
+    NSUInteger lastPageIndex = _currentPageIndex;
+    
     _currentPageIndex = currentPageIndex;
     
     if (_loopEnabled) {
         [self layoutPages];
     }
     
-    if (nil != _delegate && [_delegate respondsToSelector:@selector(pagingView:didSetPageIndex:animated:)]) {
-        [_delegate pagingView:self didSetPageIndex:currentPageIndex animated:animated];
+    if (nil != _delegate && [_delegate respondsToSelector:@selector(pagingViewDidSetPageIndex:lastPageIndex:animated:)]) {
+        [_delegate pagingViewDidSetPageIndex:self lastPageIndex:lastPageIndex animated:animated];
     }
 }
 

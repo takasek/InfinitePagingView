@@ -43,7 +43,7 @@
 - (void)pagingView:(InfinitePagingView *)pagingView willBeginDragging:(UIScrollView *)scrollView;
 - (void)pagingView:(InfinitePagingView *)pagingView didScroll:(UIScrollView *)scrollView;
 - (void)pagingView:(InfinitePagingView *)pagingView didEndDragging:(UIScrollView *)scrollView;
-- (void)pagingView:(InfinitePagingView *)pagingView didSetPageIndex:(NSUInteger)pageIndex animated:(BOOL)animated;
+- (void)pagingViewDidSetPageIndex:(InfinitePagingView *)pagingView lastPageIndex:(NSUInteger)lastPageIndex animated:(BOOL)animated;
 @end
 
 /*!
