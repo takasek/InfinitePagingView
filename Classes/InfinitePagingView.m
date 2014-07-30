@@ -245,10 +245,14 @@
 
 - (void)scrollToPage:(NSUInteger)pageIndex animated:(BOOL)animated
 {
-    [_innerScrollView scrollRectToVisible:[self pageViewFrameAtPageIndex:pageIndex ofContent:NO] animated:animated];
+    if (animated) {
+        [_innerScrollView scrollRectToVisible:[self pageViewFrameAtPageIndex:pageIndex ofContent:NO] animated:YES];
+    } else {
+        [self setCurrentPageIndex:pageIndex animated:NO];
+    }
 }
 
--(void)setCurrentPageIndex:(NSUInteger)currentPageIndex
+-(void)setCurrentPageIndex:(NSUInteger)currentPageIndex animated:(BOOL)animated
 {
     if (_currentPageIndex == currentPageIndex) return;
     
@@ -258,8 +262,8 @@
         [self layoutPages];
     }
     
-    if (nil != _delegate && [_delegate respondsToSelector:@selector(pagingView:didSetPageIndex:)]) {
-        [_delegate pagingView:self didSetPageIndex:currentPageIndex];
+    if (nil != _delegate && [_delegate respondsToSelector:@selector(pagingView:didSetPageIndex:animated:)]) {
+        [_delegate pagingView:self didSetPageIndex:currentPageIndex animated:animated];
     }
 }
 
@@ -298,7 +302,7 @@
 
 - (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView
 {
-    [self setCurrentPageIndex:[self pageIndexShownCurrently]];
+    [self setCurrentPageIndex:[self pageIndexShownCurrently] animated:YES];
 }
 
 
