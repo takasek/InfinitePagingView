@@ -54,26 +54,48 @@
 
 @implementation InfinitePagingView
 
+- (id)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self) {
+        [self _setup];
+    }
+    return self;
+}
+
+- (id)initWithCoder:(NSCoder *)aDecoder
+{
+    self = [super initWithCoder:aDecoder];
+    if (self) {
+        [self _setup];
+    }
+    return self;
+}
+
+- (void)_setup
+{
+    _currentPageIndex = 0;
+    _loopEnabled = YES;
+    self.userInteractionEnabled = YES;
+    self.clipsToBounds = YES;
+    _innerScrollView = [IPScrollView new];
+    _innerScrollView.delegate = self;
+    _innerScrollView.backgroundColor = [UIColor clearColor];
+    _innerScrollView.clipsToBounds = NO;
+    _innerScrollView.pagingEnabled = NO; //manages paging by itself
+    _innerScrollView.scrollEnabled = YES;
+    _innerScrollView.showsHorizontalScrollIndicator = NO;
+    _innerScrollView.showsVerticalScrollIndicator = NO;
+    [self addSubview:_innerScrollView];
+}
+
 - (void)setFrame:(CGRect)frame
 {
     [super setFrame:frame];
-    if (nil == _innerScrollView) {
-        _currentPageIndex = 0;
-        _loopEnabled = YES;
-        self.userInteractionEnabled = YES;
-        self.clipsToBounds = YES;
-        _innerScrollView = [[IPScrollView alloc] initWithFrame:frame];
-        _innerScrollView.delegate = self;
-        _innerScrollView.backgroundColor = [UIColor clearColor];
-        _innerScrollView.clipsToBounds = NO;
-        _innerScrollView.pagingEnabled = NO; //manages paging by itself
-        _innerScrollView.scrollEnabled = YES;
-        _innerScrollView.showsHorizontalScrollIndicator = NO;
-        _innerScrollView.showsVerticalScrollIndicator = NO;
-        [self addSubview:_innerScrollView];
-        _defaultPageSize = _maximumPageSize = frame.size;
-    }
+    
+    _defaultPageSize = _maximumPageSize = frame.size;
 }
+
 
 - (void)addPageView:(UIView *)pageView
 {
