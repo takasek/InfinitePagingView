@@ -229,14 +229,13 @@
 
 - (void)addPageView:(UIView *)pageView pageSize:(CGSize)pageSize
 {
-    _currentPageIndex = _pageViews.count;
     _pageViews = [(_pageViews ? _pageViews : @[]) arrayByAddingObject:pageView];
     _pageSizes = [(_pageSizes ? _pageSizes : @[]) arrayByAddingObject:[NSValue valueWithCGSize:pageSize]];
     
     if (CGSizeEqualToSize(_defaultPageSize, CGSizeZero))
         _maximumPageSize = CGSizeMake(MAX(_maximumPageSize.width, pageSize.width),
                                       MAX(_maximumPageSize.height, pageSize.height));
-    [self layoutPages];
+    [self setNeedsLayout];
 }
 
 - (void)scrollToPreviousPage
