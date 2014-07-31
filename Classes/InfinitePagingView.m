@@ -257,7 +257,7 @@
     _currentPageIndex = pageIndex;
     
     if (_loopEnabled) {
-        [self layoutPages];
+        [self setNeedsLayout];
     }
     
     if (nil != _delegate && [_delegate respondsToSelector:@selector(pagingViewDidSetPageIndex:lastPageIndex:animated:)]) {
