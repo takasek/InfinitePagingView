@@ -234,7 +234,7 @@
 {
     if (!_pageViews.count) return;
     
-    _innerScrollView.frame = [self scrollViewFrame];
+    _innerScrollView.frame = [self scrollViewFrameAtIndex:_currentPageIndex];
     _innerScrollView.contentSize = [self scrollViewContentSize];
     _innerScrollView.contentOffset = [self pageOriginAtIndex:_currentPageIndex];
     
@@ -284,7 +284,16 @@
 - (void)scrollToPage:(NSUInteger)pageIndex animated:(BOOL)animated
 {
     if (animated) {
-        [_innerScrollView scrollRectToVisible:[self pageViewFrameAtPageIndex:pageIndex ofContent:NO] animated:YES];
+        CGRect rect = ({
+            CGRect rect = [self pageViewFrameAtPageIndex:pageIndex ofContent:NO];
+            CGSize currentSize = _innerScrollView.frame.size;
+            int sign = ([self offsetWithPageIndex:pageIndex basePageIndex:_currentPageIndex] > 0) ? -1 : +1;
+            rect.origin.x += (rect.size.width-currentSize.width)/2 * sign;
+            rect.origin.y += (rect.size.height-currentSize.height)/2 * sign;
+            rect;
+        });
+        
+        [_innerScrollView scrollRectToVisible:rect animated:YES];
     } else {
         [self setCurrentPageIndex:pageIndex animated:NO];
     }
@@ -338,9 +347,9 @@
 
 
 #pragma mark - value affected by horizontal/vertical direction
-- (CGRect)scrollViewFrame
+- (CGRect)scrollViewFrameAtIndex:(NSUInteger)pageIndex
 {
-    CGFloat currentPageWidth = [self pageSizeAtIndex:_currentPageIndex].width;
+    CGFloat currentPageWidth = [self pageSizeAtIndex:pageIndex].width;
     CGSize selfSize = self.frame.size;
     return CGRectMake((selfSize.width-currentPageWidth)/2, 0, currentPageWidth, selfSize.height);
 }
@@ -360,8 +369,8 @@
     
     NSInteger i = pageIndex;
     while ([self viewOrderWithPageIndex:i] > 0) {
-        result.x += [self pageSizeAtIndex:i].width;
         i = [self shiftedPageIndex:i offset:-1];
+        result.x += [self pageSizeAtIndex:i].width;
     }
     
     return result;
@@ -372,9 +381,9 @@
 
 
 @implementation VerticalInfinitePagingView
-- (CGRect)scrollViewFrame
+- (CGRect)scrollViewFrameAtIndex:(NSUInteger)pageIndex
 {
-    CGFloat currentPageHeight = [self pageSizeAtIndex:self.currentPageIndex].height;
+    CGFloat currentPageHeight = [self pageSizeAtIndex:pageIndex].height;
     CGSize selfSize = self.frame.size;
     return CGRectMake(0, (selfSize.height-currentPageHeight)/2, selfSize.width, currentPageHeight);
 }
