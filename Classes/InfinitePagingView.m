@@ -222,6 +222,8 @@
 
 - (void)layoutPages
 {
+    if (!_pageViews.count) return;
+    
     _innerScrollView.frame = [self scrollViewFrame];
     _innerScrollView.contentSize = [self scrollViewContentSize];
     _innerScrollView.contentOffset = [self pageOriginAtIndex:_currentPageIndex];
