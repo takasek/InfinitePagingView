@@ -197,7 +197,7 @@
 - (NSUInteger)pageIndexWithPointInContent:(CGPoint)point
 {
     for (int i=0; i<_pageSizes.count; i++) {
-        CGRect frame = [self pageViewFrameAtPageIndex:i ofContent:NO];
+        CGRect frame = [self pageViewFrameAtIndex:i ofContent:NO];
         if (CGRectContainsPoint(frame, point)) {
             return i;
         }
@@ -205,7 +205,7 @@
     return NSNotFound;
 }
 
-- (CGRect)pageViewFrameAtPageIndex:(NSUInteger)pageIndex ofContent:(BOOL)ofContent
+- (CGRect)pageViewFrameAtIndex:(NSUInteger)pageIndex ofContent:(BOOL)ofContent
 {
     if (!_pageViews.count) return CGRectZero;
     
@@ -239,7 +239,7 @@
     _innerScrollView.contentOffset = [self pageOriginAtIndex:_currentPageIndex];
     
     [_pageViews enumerateObjectsUsingBlock:^(UIView *pageView, NSUInteger idx, BOOL *stop) {
-        pageView.frame = [self pageViewFrameAtPageIndex:idx ofContent:YES];
+        pageView.frame = [self pageViewFrameAtIndex:idx ofContent:YES];
         [_innerScrollView addSubview:pageView];
     }];
     
@@ -285,7 +285,7 @@
 {
     if (animated) {
         CGRect rect = ({
-            CGRect rect = [self pageViewFrameAtPageIndex:pageIndex ofContent:NO];
+            CGRect rect = [self pageViewFrameAtIndex:pageIndex ofContent:NO];
             CGSize currentSize = _innerScrollView.frame.size;
             int sign = ([self offsetWithPageIndex:pageIndex basePageIndex:_currentPageIndex] > 0) ? -1 : +1;
             rect.origin.x += (rect.size.width-currentSize.width)/2 * sign;
