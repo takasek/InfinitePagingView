@@ -55,7 +55,7 @@
 /*!
  @var CGFloat width of inner page.
  */
-@property (nonatomic, assign, readonly) CGSize defaultPageSize;
+@property (nonatomic, assign) CGSize defaultPageSize;
 
 /*!
  @var NSUInteger index of page views.
@@ -76,8 +76,6 @@
  @var InfinitePagingViewDelegate
  */
 @property (nonatomic, assign) id<InfinitePagingViewDelegate> delegate;
-
-- (void)setPageSize:(CGSize)pageSize;
 
 /*!
  Add a view object to inner scrollView view. Page size must be defaultPageSize.
@@ -107,7 +105,7 @@
 - (void)scrollToNextPage;
 
 /*!
- Scroll to specified page.
+ Scroll to specified page with animation.
  @method scrollToPage:
  @param NSUInteger pageIndex
  */

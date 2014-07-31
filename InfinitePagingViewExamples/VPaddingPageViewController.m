@@ -23,7 +23,7 @@
     VerticalInfinitePagingView *pagingView = [[VerticalInfinitePagingView alloc] initWithFrame:CGRectMake(self.view.center.x - 65.f, 0.f, 130.f, self.view.frame.size.height - naviBarHeight)];
     pagingView.backgroundColor = [UIColor brownColor];
     // View size per one page.
-    [pagingView setPageSize:CGSizeMake(120.f, 120.0f)];
+    pagingView.defaultPageSize = CGSizeMake(120.f, 120.f);
     [self.view addSubview:pagingView];
     
     for (NSUInteger i = 1; i <= 15; ++i) {

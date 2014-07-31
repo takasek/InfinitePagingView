@@ -115,18 +115,20 @@
 
 - (UIView *)pageViewAtIndex:(NSUInteger)pageIndex
 {
-    return [_pageViews objectAtIndex:pageIndex];
+    return _pageViews[pageIndex];
 }
 
-- (void)setPageSize:(CGSize)pageSize
+- (void)setDefaultPageSize:(CGSize)pageSize
 {
     _defaultPageSize = _maximumPageSize = pageSize;
     
-    NSMutableArray *newPageSizes = @[].mutableCopy;
-    for (int i=0; i<_pageSizes.count; i++) {
-        [newPageSizes addObject:[NSValue valueWithCGSize:pageSize]];
-    }
-    [self setPageSizes:newPageSizes.copy];
+    _pageSizes = ({
+        NSMutableArray *newPageSizes = @[].mutableCopy;
+        for (int i=0; i<_pageSizes.count; i++) {
+            [newPageSizes addObject:[NSValue valueWithCGSize:pageSize]];
+        }
+        newPageSizes.copy;
+    });
 }
 
 - (CGSize)pageSizeAtIndex:(NSUInteger)index
@@ -238,13 +240,13 @@
     }
 }
 
--(void)setCurrentPageIndex:(NSUInteger)currentPageIndex animated:(BOOL)animated
+-(void)setCurrentPageIndex:(NSUInteger)pageIndex animated:(BOOL)animated
 {
-    if (_currentPageIndex == currentPageIndex) return;
+    if (_currentPageIndex == pageIndex) return;
     
     NSUInteger lastPageIndex = _currentPageIndex;
     
-    _currentPageIndex = currentPageIndex;
+    _currentPageIndex = pageIndex;
     
     if (_loopEnabled) {
         [self layoutPages];
