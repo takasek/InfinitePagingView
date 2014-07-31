@@ -117,7 +117,11 @@
 
 - (UIView *)pageViewAtIndex:(NSUInteger)pageIndex
 {
-    return _pageViews[pageIndex];
+    if (_pageViews.count > pageIndex) {
+        return _pageViews[pageIndex];
+    } else {
+        return nil;
+    }
 }
 
 - (void)setDefaultPageSize:(CGSize)pageSize
@@ -133,9 +137,13 @@
     });
 }
 
-- (CGSize)pageSizeAtIndex:(NSUInteger)index
+- (CGSize)pageSizeAtIndex:(NSUInteger)pageIndex
 {
-    return [(NSValue*)_pageSizes[index] CGSizeValue];
+    if (_pageSizes.count > pageIndex) {
+        return [(NSValue*)_pageSizes[pageIndex] CGSizeValue];
+    } else {
+        return CGSizeZero;
+    }
 }
 
 -(NSUInteger)shiftedPageIndex:(NSUInteger)baseIndex offset:(NSInteger)offset
