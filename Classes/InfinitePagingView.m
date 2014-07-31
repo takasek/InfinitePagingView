@@ -92,7 +92,9 @@
 {
     [super setFrame:frame];
     
-    _defaultPageSize = _maximumPageSize = frame.size;
+    if (CGSizeEqualToSize(_defaultPageSize, CGSizeZero)) {
+        _defaultPageSize = _maximumPageSize = frame.size;
+    }
 }
 
 
