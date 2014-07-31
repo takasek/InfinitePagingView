@@ -53,11 +53,6 @@
 @interface InfinitePagingView : UIView <UIScrollViewDelegate>
 
 /*!
- @var BOOL activates looping. (default = YES)
- */
-@property (nonatomic, assign) BOOL loopEnabled;
-
-/*!
  @var CGFloat width of inner page.
  */
 @property (nonatomic, assign, readonly) CGSize defaultPageSize;
@@ -65,22 +60,27 @@
 /*!
  @var NSUInteger index of page views.
  */
-@property (nonatomic, assign) NSUInteger currentPageIndex;
-
-/*!
- @var InfinitePagingViewDelegate
- */
-@property (nonatomic, assign) id<InfinitePagingViewDelegate> delegate;
+@property (nonatomic, assign, readonly) NSUInteger currentPageIndex;
 
 /*!
  @var UIScrollView innerScrollView
  */
 @property (nonatomic, strong, readonly) UIScrollView *innerScrollView;
 
+/*!
+ @var BOOL activates looping. (default = YES)
+ */
+@property (nonatomic, assign) BOOL loopEnabled;
+
+/*!
+ @var InfinitePagingViewDelegate
+ */
+@property (nonatomic, assign) id<InfinitePagingViewDelegate> delegate;
+
 - (void)setPageSize:(CGSize)pageSize;
 
 /*!
- Add a view object to inner scrollView view.
+ Add a view object to inner scrollView view. Page size must be defaultPageSize.
  @method addPageView:
  @param UIView *pageView
  */
@@ -112,6 +112,14 @@
  @param NSUInteger pageIndex
  */
 - (void)scrollToPage:(NSUInteger)pageIndex;
+
+/*!
+ Scroll to specified page controlling animation.
+ @method scrollToPage:
+ @param NSUInteger pageIndex
+ @param BOOL animated
+ */
+- (void)scrollToPage:(NSUInteger)pageIndex animated:(BOOL)animated;
 
 /*!
  Let each pageView to do something.

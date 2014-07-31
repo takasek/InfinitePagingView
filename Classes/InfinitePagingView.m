@@ -44,7 +44,6 @@
 @end
 
 @interface InfinitePagingView()
-@property (nonatomic, assign) CGSize defaultPageSize;
 @property (nonatomic, assign) CGSize maximumPageSize;
 
 @property (nonatomic, strong) NSArray *pageViews;
@@ -144,9 +143,9 @@
     NSInteger result = baseIndex + offset;
     
     if (result < 0) {
-        result += self.pageViews.count;
-    } else if (result >= self.pageViews.count) {
-        result -= self.pageViews.count;
+        result += _pageViews.count;
+    } else if (result >= _pageViews.count) {
+        result -= _pageViews.count;
     }
     
     return result;
@@ -156,10 +155,10 @@
 {
     NSInteger offset = targetPageIndex - basePageIndex;
     
-    if (offset < -floor(self.pageViews.count / 2)) {
-        offset += self.pageViews.count;
-    } else if (offset > floor(self.pageViews.count / 2)) {
-        offset -= self.pageViews.count;
+    if (offset < -floor(_pageViews.count / 2)) {
+        offset += _pageViews.count;
+    } else if (offset > floor(_pageViews.count / 2)) {
+        offset -= _pageViews.count;
     }
     
     return offset;
@@ -171,8 +170,8 @@
         return pageIndex;
     }
     
-    NSInteger offset = [self offsetWithPageIndex:pageIndex basePageIndex:self.currentPageIndex];
-    NSUInteger orderOfCurrentPageIndex = floor(self.pageViews.count/2);
+    NSInteger offset = [self offsetWithPageIndex:pageIndex basePageIndex:_currentPageIndex];
+    NSUInteger orderOfCurrentPageIndex = floor(_pageViews.count/2);
     return orderOfCurrentPageIndex + offset;
 }
 
@@ -200,7 +199,7 @@
 
 - (CGRect)pageViewFrameAtPageIndex:(NSUInteger)pageIndex ofContent:(BOOL)ofContent
 {
-    if (!self.pageViews.count) return CGRectZero;
+    if (!_pageViews.count) return CGRectZero;
     
     CGRect result = CGRectZero;
     result.origin = [self pageOriginAtIndex:pageIndex];
@@ -339,7 +338,7 @@
 - (CGSize)scrollViewContentSize
 {
     CGSize size = CGSizeMake(0, self.frame.size.height);
-    for (NSValue *val in self.pageSizes) {
+    for (NSValue *val in _pageSizes) {
         size.width += [val CGSizeValue].width;
     }
     return size;
