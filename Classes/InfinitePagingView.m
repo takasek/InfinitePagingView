@@ -133,11 +133,7 @@
 
 - (CGSize)pageSizeAtIndex:(NSUInteger)index
 {
-    if (_loopEnabled) {
-        return [(NSValue*)_pageSizes[index] CGSizeValue];
-    } else {
-        return _maximumPageSize;
-    }
+    return [(NSValue*)_pageSizes[index] CGSizeValue];
 }
 
 -(NSUInteger)shiftedPageIndex:(NSUInteger)baseIndex offset:(NSInteger)offset
@@ -350,14 +346,10 @@
 {
     CGPoint result = CGPointZero;
     
-    if (_loopEnabled) {
-        NSInteger i = pageIndex;
-        while ([self viewOrderWithPageIndex:i] > 0) {
-            result.x += [self pageSizeAtIndex:i].width;
-            i = [self shiftedPageIndex:i offset:-1];
-        }
-    } else {
-        result.x = pageIndex * _maximumPageSize.width;
+    NSInteger i = pageIndex;
+    while ([self viewOrderWithPageIndex:i] > 0) {
+        result.x += [self pageSizeAtIndex:i].width;
+        i = [self shiftedPageIndex:i offset:-1];
     }
     
     return result;
@@ -388,14 +380,10 @@
 {
     CGPoint result = CGPointZero;
     
-    if (self.loopEnabled) {
-        NSInteger i = pageIndex;
-        while ([self viewOrderWithPageIndex:i] > 0) {
-            result.y += [self pageSizeAtIndex:i].height;
-            i = [self shiftedPageIndex:i offset:-1];
-        }
-    } else {
-        result.y = pageIndex * self.maximumPageSize.height;
+    NSInteger i = pageIndex;
+    while ([self viewOrderWithPageIndex:i] > 0) {
+        result.y += [self pageSizeAtIndex:i].height;
+        i = [self shiftedPageIndex:i offset:-1];
     }
     
     return result;
