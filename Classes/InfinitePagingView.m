@@ -232,7 +232,7 @@
 
 - (void)layoutPages
 {
-    if (!_pageViews.count) return;
+    if (!_pageViews.count || _currentPageIndex == NSNotFound) return;
     
     _innerScrollView.frame = [self scrollViewFrameAtIndex:_currentPageIndex];
     _innerScrollView.contentSize = [self scrollViewContentSize];
