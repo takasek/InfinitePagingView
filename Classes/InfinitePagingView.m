@@ -287,16 +287,21 @@
         CGRect rect = ({
             CGRect rect = [self pageViewFrameAtIndex:pageIndex ofContent:NO];
             CGSize currentSize = _innerScrollView.frame.size;
-            int sign = ([self offsetWithPageIndex:pageIndex basePageIndex:_currentPageIndex] > 0) ? -1 : +1;
-            rect.origin.x += (rect.size.width-currentSize.width)/2 * sign;
-            rect.origin.y += (rect.size.height-currentSize.height)/2 * sign;
+            rect.origin.x += (rect.size.width-currentSize.width)/2;
+            rect.origin.y += (rect.size.height-currentSize.height)/2;
+            rect.size = currentSize;
             rect;
         });
         
-        [_innerScrollView scrollRectToVisible:rect animated:YES];
-    } else {
-        [self setCurrentPageIndex:pageIndex animated:NO];
+        if (!CGPointEqualToPoint(_innerScrollView.contentOffset, rect.origin)) {
+            [_innerScrollView scrollRectToVisible:rect animated:YES];
+            return;
+            //expect to animate and call -scrollViewDidEndScrollingAnimation:
+        }
     }
+    
+    //doesn't scroll.
+    [self setCurrentPageIndex:pageIndex animated:NO];
 }
 
 - (void)enumeratePageViewsUsingBlock:(void (^)(UIView *pageView, NSUInteger pageIndex, NSUInteger currentPageIndex, BOOL *stop))block
