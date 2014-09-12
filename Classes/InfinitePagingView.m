@@ -373,7 +373,10 @@
     CGPoint result = CGPointZero;
     
     NSInteger i = pageIndex;
-    while ([self viewOrderWithPageIndex:i] > 0) {
+    while (true) {
+        NSInteger order = [self viewOrderWithPageIndex:i];
+        if (order == 0 || order == _pageViews.count) break;
+        
         i = [self shiftedPageIndex:i offset:-1];
         result.x += [self pageSizeAtIndex:i].width;
     }
