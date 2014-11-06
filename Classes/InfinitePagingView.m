@@ -115,6 +115,18 @@
     [self setNeedsLayout];
 }
 
+- (void)cleanAllPages
+{
+    _currentPageIndex = 0;
+    _pageViews = @[];
+    _pageSizes = @[];
+    _defaultPageSize = _maximumPageSize = self.frame.size;
+    [_innerScrollView.subviews enumerateObjectsUsingBlock:^(UIView *view, NSUInteger idx, BOOL *stop) {
+        [view removeFromSuperview];
+    }];
+    [self setNeedsLayout];
+}
+
 - (UIView *)pageViewAtIndex:(NSUInteger)pageIndex
 {
     if (_pageViews.count > pageIndex) {

@@ -93,6 +93,12 @@
 - (void)addPageView:(UIView *)pageView pageSize:(CGSize)pageSize;
 
 /*!
+ Clean and initialize all views on inner scrollView.
+ @method cleanAllPages
+ */
+- (void)cleanAllPages;
+
+/*!
  Scroll to previous page.
  @method scrollToPrevious
  */
