@@ -78,6 +78,12 @@
 @property (nonatomic, assign) id<InfinitePagingViewDelegate> delegate;
 
 /*!
+ @var BOOL activates inertia. (default = NO)
+ */
+@property (nonatomic, assign) BOOL inertiaEnabled;
+
+
+/*!
  Add a view object to inner scrollView view. Page size must be defaultPageSize.
  @method addPageView:
  @param UIView *pageView

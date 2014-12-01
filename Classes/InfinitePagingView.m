@@ -83,6 +83,7 @@
     _innerScrollView.clipsToBounds = NO;
     _innerScrollView.pagingEnabled = NO; //manages paging by itself
     _innerScrollView.scrollEnabled = YES;
+    _innerScrollView.decelerationRate = UIScrollViewDecelerationRateFast;
     _innerScrollView.showsHorizontalScrollIndicator = NO;
     _innerScrollView.showsVerticalScrollIndicator = NO;
     [self addSubview:_innerScrollView];
@@ -346,20 +347,37 @@
         [_delegate pagingView:self didEndDragging:_innerScrollView];
     }
     
-    dispatch_async(dispatch_get_main_queue(), ^{
+    if (_inertiaEnabled) {
         [self scrollToPage:[self pageIndexShownCurrently] animated:YES];
-    });
+    } else {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self scrollToPage:[self pageIndexShownCurrently] animated:YES];
+        });
+    }
 }
 
 - (void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView
 {
-    //invalidate decelerating
-    [scrollView setContentOffset:scrollView.contentOffset animated:NO];
+    if (_inertiaEnabled) {
+    } else {
+        //invalidate decelerating
+        [scrollView setContentOffset:scrollView.contentOffset animated:NO];
+    }
+}
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+{
+    if (_inertiaEnabled) {
+        [self scrollToPage:[self pageIndexShownCurrently] animated:YES];
+    }
 }
 
 - (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView
 {
-    [self setCurrentPageIndex:[self pageIndexShownCurrently] animated:YES];
+    if (_inertiaEnabled && scrollView.isDecelerating) {
+    } else {
+        [self setCurrentPageIndex:[self pageIndexShownCurrently] animated:YES];
+    }
 }
 
 
