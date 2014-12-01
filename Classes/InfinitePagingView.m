@@ -82,6 +82,7 @@
     _innerScrollView = [IPScrollView new];
     _innerScrollView.delegate = self;
     _innerScrollView.backgroundColor = [UIColor clearColor];
+    _innerScrollView.bounces = NO;
     _innerScrollView.clipsToBounds = NO;
     _innerScrollView.pagingEnabled = NO; //manages paging by itself
     _innerScrollView.scrollEnabled = YES;
@@ -324,7 +325,8 @@
             rect;
         });
         
-        if (!CGPointEqualToPoint(_innerScrollView.contentOffset, rect.origin)) {
+        BOOL isInside = CGRectContainsRect(CGRectMake(0, 0, _innerScrollView.contentSize.width, _innerScrollView.contentSize.height), rect);
+        if (isInside && !CGPointEqualToPoint(_innerScrollView.contentOffset, rect.origin)) {
             [_innerScrollView scrollRectToVisible:rect animated:YES];
             return;
             //expect to animate and call -scrollViewDidEndScrollingAnimation:
