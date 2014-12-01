@@ -49,6 +49,8 @@
 @property (nonatomic, strong) NSArray *pageViews;
 @property (nonatomic, strong) NSArray *pageSizes;
 @property (nonatomic, strong) IPScrollView *innerScrollView;
+@property (nonatomic, strong) NSTimer *adjusterTimer;
+@property (nonatomic, assign) BOOL isDragging;
 @end
 
 @implementation InfinitePagingView
@@ -273,11 +275,27 @@
         [self setNeedsLayout];
     }
     
-    if (nil != _delegate && [_delegate respondsToSelector:@selector(pagingViewDidSetPageIndex:lastPageIndex:animated:)]) {
+    if (!_innerScrollView.isDecelerating && nil != _delegate && [_delegate respondsToSelector:@selector(pagingViewDidSetPageIndex:lastPageIndex:animated:)]) {
         [_delegate pagingViewDidSetPageIndex:self lastPageIndex:lastPageIndex animated:animated];
     }
 }
 
+- (void)scrollToCurrentPage
+{
+    [_adjusterTimer invalidate];
+    _adjusterTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(scrollToCurrentPageFromTimer) userInfo:nil repeats:NO];
+}
+
+- (void)scrollToCurrentPageFromTimer
+{
+    [_adjusterTimer invalidate];
+    _adjusterTimer = nil;
+    
+    if (_isDragging) {
+        return;
+    }
+    [self scrollToPage:[self pageIndexShownCurrently] animated:YES];
+}
 
 - (void)scrollToPreviousPage
 {
@@ -329,6 +347,11 @@
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
 {
+    _isDragging = YES;
+    if (_adjusterTimer) {
+        [_adjusterTimer invalidate];
+        _adjusterTimer = nil;
+    }
     if (nil != _delegate && [_delegate respondsToSelector:@selector(pagingView:willBeginDragging:)]) {
         [_delegate pagingView:self willBeginDragging:_innerScrollView];
     }
@@ -336,6 +359,12 @@
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
+    CGRect frame = CGRectZero;
+    frame.size = scrollView.contentSize;
+    if (!CGRectContainsPoint(frame, scrollView.contentOffset)) {
+        [self setCurrentPageIndex:[self pageIndexShownCurrently] animated:NO];
+    }
+    
     if (nil != _delegate && [_delegate respondsToSelector:@selector(pagingView:didScroll:)]) {
         [_delegate pagingView:self didScroll:_innerScrollView];
     }
@@ -343,17 +372,17 @@
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {
-    if (nil != _delegate && [_delegate respondsToSelector:@selector(pagingView:didEndDragging:)]) {
-        [_delegate pagingView:self didEndDragging:_innerScrollView];
-    }
-    
     if (_inertiaEnabled) {
-        [self scrollToPage:[self pageIndexShownCurrently] animated:YES];
+        [self scrollToCurrentPage];
     } else {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self scrollToPage:[self pageIndexShownCurrently] animated:YES];
+            if (nil != _delegate && [_delegate respondsToSelector:@selector(pagingView:didEndDragging:)]) {
+                [_delegate pagingView:self didEndDragging:_innerScrollView];
+            }
+            [self scrollToCurrentPage];
         });
     }
+    _isDragging = NO;
 }
 
 - (void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView
@@ -368,7 +397,7 @@
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
     if (_inertiaEnabled) {
-        [self scrollToPage:[self pageIndexShownCurrently] animated:YES];
+        [self scrollToCurrentPage];
     }
 }
 
